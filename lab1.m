@@ -17,28 +17,39 @@
 I=imread('Data/0005_s.png'); % we have to be in the proper folder
 
 % ToDo: generate a matrix H which produces a similarity transformation
+% createSimilarityH(theta, tx, ty, scale)
 H = createSimilarityH(-4.0, 100, 100, 0.1);
 I2 = apply_H(I, H);
-figure; imshow(I); figure; imshow(uint8(I2));
+% figure; imshow(I); figure; imshow(uint8(I2));
 
 
 %% 1.2. Affinities
 
 % ToDo: generate a matrix H which produces an affine transformation
-
+% createAffinityH(theta, phi, tx, ty, scalex, scaley)
+H = createAffinityH(0.3, 0.5, 3, -4, 1, 1.8);
 I2 = apply_H(I, H);
 figure; imshow(I); figure; imshow(uint8(I2));
 
 % ToDo: decompose the affinity in four transformations: two
 % rotations, a scale, and a translation
+[rotation1, rotation2, scale, translation] = decomposeAffinity(H);
+
+
 
 % ToDo: verify that the product of the four previous transformations
 % produces the same matrix H as above
 
+Hrecomp=scale.*rotation1+scale.*rotation2+translation;
+if(Hrecomp==H)
+    display('product of decomposition the same as original matrix');
+end
+
 % ToDo: verify that the proper sequence of the four previous
 % transformations over the image I produces the same image I2 as before
 
-
+I2 = apply_H(I, Hrecomp);
+figure; imshow(I); figure; imshow(uint8(I2));
 
 %% 1.3 Projective transformations (homographies)
 
