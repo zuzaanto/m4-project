@@ -139,64 +139,14 @@ plot(t, -(lr4(1)*t + lr4(3)) / lr4(2), 'y');
 %       the metric rectification) with the chosen lines printed on it.
 %       Compute also the angles between the pair of lines before and after
 %       rectification.
-r_l1 = cross(p1, p4);  %r_l1 is perpendicular to r_m1
-r_m1 = cross(p2, p3);
-r_l2 = l1;             %r_l2 is perpendicular to r_m2
-r_m2 = l3;
+r_m1 = l1;             %r_l2 is perpendicular to r_m2
+r_l1 = l3;
+r_m2 = cross(p1, p4);  %r_l1 is perpendicular to r_m1
+r_l2 = cross(p2, p3);
 
-r_l1 = (transpose(H)) \ r_l1;
-r_m1 = (transpose(H)) \ r_m1;
-r_l2 = (transpose(H)) \ r_l2;
-r_m2 = (transpose(H)) \ r_m2;
-
-hold on;
-t=1:0.1:1000;
-plot(t, -(r_l1(1)*t + r_l1(3)) / r_l1(2), 'r');
-plot(t, -(r_m1(1)*t + r_m1(3)) / r_m1(2), 'b');
-plot(t, -(r_l2(1)*t + r_l2(3)) / r_l2(2), 'w');
-plot(t, -(r_m2(1)*t + r_m2(3)) / r_m2(2), 'w');
-
-A_ = [r_l1(1)*r_m1(1) , r_l1(1)*r_m1(2)+r_l1(2)*r_m1(1) ;
-      r_l2(1)*r_m2(1) , r_l2(1)*r_m2(2)+r_l2(2)*r_m2(1) ];
-b_ = [-r_l1(2)*r_m1(2) , -r_l2(2)*r_m2(2)]';
-
-
-s_vec = linsolve(A_,b_);
-disp(s_vec)
-S_mat = [s_vec(1),s_vec(2);s_vec(2),1];
-i
-A = chol(S_mat);
-disp(A)
-H = zeros(3,3);
-H(1:2,1:2) = inv(A');
-H(3,3) = 1;
-
-I3 = apply_H(I2, H);
-figure; imshow(uint8(I3*255));
-
-l1_ang = atan(((-(r_l2(1)*1000 + r_l2(3)) / r_l2(2)) + ((r_l2(3)) / r_l2(2)))/(1000));
-l2_ang = atan(((-(r_m2(1)*1000 + r_m2(3)) / r_m2(2)) +((r_m2(3)) / r_m2(2)))/(1000));
-before_angle = (l1_ang - l2_ang)* 180/pi;
-disp(abs(before_angle))
-
-r_l1 = (transpose(H)) \ r_l1;
-r_m1 = (transpose(H)) \ r_m1;
-r_l2 = (transpose(H)) \ r_l2;
-r_m2 = (transpose(H)) \ r_m2;
-
-% show the transformed lines in the transformed image
-hold on;
-t=1:0.1:1000;
-plot(t, -(r_l1(1)*t + r_l1(3)) / r_l1(2), 'r');
-plot(t, -(r_m1(1)*t + r_m1(3)) / r_m1(2), 'b');
-plot(t, -(r_l2(1)*t + r_l2(3)) / r_l2(2), 'w');
-plot(t, -(r_m2(1)*t + r_m2(3)) / r_m2(2), 'w');
-
-l1_ang = atan(((-(r_l2(1)*1000 + r_l2(3)) / r_l2(2)) + ((r_l2(3)) / r_l2(2)))/(1000));
-l2_ang = atan(((-(r_m2(1)*1000 + r_m2(3)) / r_m2(2)) +((r_m2(3)) / r_m2(2)))/(1000));
-
-after_angle = (l1_ang - l2_ang)* 180/pi;
-disp(abs(after_angle))
+[ before_angles, after_angles ] = metric_rect(I2,H,r_l1,r_m1,r_l2,r_m2 );
+disp(before_angles)
+disp(after_angles)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% 4. Affine and Metric Rectification of the left facade of image 0001
 
@@ -265,6 +215,20 @@ plot(t, -(lr1(1)*t + lr1(3)) / lr1(2), 'y');
 plot(t, -(lr2(1)*t + lr2(3)) / lr2(2), 'y');
 plot(t, -(lr3(1)*t + lr3(3)) / lr3(2), 'y');
 plot(t, -(lr4(1)*t + lr4(3)) / lr4(2), 'y');
+
+
+
+
+
+r_m1 = cross(p1, p4);  %r_l1 is perpendicular to r_m1
+r_l1 = cross(p2, p3);
+r_m2 = l1;             %r_l2 is perpendicular to r_m2
+r_l2 = l3;
+
+[ before_angles, after_angles ] = metric_rect(I2,H,r_l1,r_m1,r_l2,r_m2 );
+disp(before_angles)
+disp(after_angles)
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% 5. OPTIONAL: Metric Rectification in a single step
