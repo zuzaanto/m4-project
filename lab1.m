@@ -108,7 +108,7 @@ H = eye(3,3);
 H(3,:) = l;
 
 I2 = apply_H(I, H);
-figure; imshow(uint8(I2));
+figure; imshow(uint8(I2*255));
 
 % ToDo: compute the transformed lines lr1, lr2, lr3, lr4
 lr1 = inv(transpose(H)) * l1;
@@ -117,12 +117,12 @@ lr3 = inv(transpose(H)) * l3;
 lr4 = inv(transpose(H)) * l4;
 
 % show the transformed lines in the transformed image
-figure;imshow(uint8(I2));
+figure;imshow(uint8(I2*255));
 hold on;
 t=1:0.1:1000;
-plot(t, -(lr1(1)*t + lr1(3)) / lr1(2), 'y');
-plot(t, -(lr2(1)*t + lr2(3)) / lr2(2), 'y');
-plot(t, -(lr3(1)*t + lr3(3)) / lr3(2), 'y');
+plot(t, -(lr1(1)*t + lr1(3)) / lr1(2), 'r');
+plot(t, -(lr2(1)*t + lr2(3)) / lr2(2), 'b');
+plot(t, -(lr3(1)*t + lr3(3)) / lr3(2), 'g');
 plot(t, -(lr4(1)*t + lr4(3)) / lr4(2), 'y');
 
 % ToDo: to evaluate the results, compute the angle between the different pair 
@@ -192,7 +192,7 @@ H(3,:) = l;
 
 
 I2 = apply_H(I, H);
-figure; imshow(uint8(I2));
+figure; imshow(uint8(I2*255));
 
 % ToDo: compute the transformed lines lr1, lr2, lr3, lr4
 lr1 = inv(transpose(H)) * l1;
@@ -201,7 +201,7 @@ lr3 = inv(transpose(H)) * l3;
 lr4 = inv(transpose(H)) * l4;
 
 % show the transformed lines in the transformed image
-figure;imshow(uint8(I2));
+figure;imshow(uint8(I2*255));
 hold on;
 t=1:0.1:1000;
 plot(t, -(lr1(1)*t + lr1(3)) / lr1(2), 'y');
