@@ -85,9 +85,9 @@ p8 = [A(i,3) A(i,4) 1]';
 
 % ToDo: compute the lines l1, l2, l3, l4, that pass through the different pairs of points
 l1 = cross(p1, p2);
-l2 = cross(p3, p4);
+l2 = cross(p3, p4); %l1//l2
 l3 = cross(p5, p6);
-l4 = cross(p7, p8);
+l4 = cross(p7, p8); %l3//l4
 
 % show the chosen lines in the image
 figure;imshow(I);
@@ -139,7 +139,63 @@ plot(t, -(lr4(1)*t + lr4(3)) / lr4(2), 'y');
 %       the metric rectification) with the chosen lines printed on it.
 %       Compute also the angles between the pair of lines before and after
 %       rectification.
+r_l1 = cross(p1, p4);  %r_l1 is perpendicular to r_m1
+r_m1 = cross(p2, p3);
+r_l2 = l1;             %r_l2 is perpendicular to r_m2
+r_m2 = l3;
 
+r_l1 = inv(transpose(H)) * r_l1;
+r_m1 = inv(transpose(H)) * r_m1;
+r_l2 = inv(transpose(H)) * r_l2;
+r_m2 = inv(transpose(H)) * r_m2;
+
+hold on;
+t=1:0.1:1000;
+plot(t, -(r_l1(1)*t + r_l1(3)) / r_l1(2), 'r');
+plot(t, -(r_m1(1)*t + r_m1(3)) / r_m1(2), 'b');
+plot(t, -(r_l2(1)*t + r_l2(3)) / r_l2(2), 'w');
+plot(t, -(r_m2(1)*t + r_m2(3)) / r_m2(2), 'w');
+
+A_ = [r_l1(1)*r_m1(1) , r_l1(1)*r_m1(2)+r_l1(2)*r_m1(1) ;
+      r_l2(1)*r_m2(1) , r_l2(1)*r_m2(2)+r_l2(2)*r_m2(1) ];
+b_ = [-r_l1(2)*r_m1(2) , -r_l2(2)*r_m2(2)]';
+
+
+s_vec = linsolve(A_,b_);
+disp(s_vec)
+S_mat = [s_vec(1),s_vec(2);s_vec(2),1];
+
+A = chol(S_mat);
+disp(A)
+H = zeros(3,3);
+H(1:2,1:2) = inv(A);
+H(3,3) = 1;
+
+I3 = apply_H(I2, H);
+figure; imshow(uint8(I3*255));
+
+l1_ang = atan(((-(r_l2(1)*100 + r_l2(3)) / r_l2(2)) + ((r_l2(3)) / r_l2(2)))/(100));
+l2_ang = atan(((-(r_m2(1)*100 + r_m2(3)) / r_m2(2)) +((r_m2(3)) / r_m2(2)))/(100));
+before_angle = (l1_ang - l2_ang)* 180/pi;
+disp(abs(before_angle))
+
+r_l1 = inv(transpose(H)) * r_l1;
+r_m1 = inv(transpose(H)) * r_m1;
+r_l2 = inv(transpose(H)) * r_l2;
+r_m2 = inv(transpose(H)) * r_m2;
+
+% show the transformed lines in the transformed image
+hold on;
+t=1:0.1:1000;
+plot(t, -(r_l1(1)*t + r_l1(3)) / r_l1(2), 'r');
+plot(t, -(r_m1(1)*t + r_m1(3)) / r_m1(2), 'b');
+plot(t, -(r_l2(1)*t + r_l2(3)) / r_l2(2), 'w');
+plot(t, -(r_m2(1)*t + r_m2(3)) / r_m2(2), 'w');
+
+l1_ang = atan(((-(r_l2(1)*100 + r_l2(3)) / r_l2(2)) + ((r_l2(3)) / r_l2(2)))/(100));
+l2_ang = atan(((-(r_m2(1)*100 + r_m2(3)) / r_m2(2)) +((r_m2(3)) / r_m2(2)))/(100));
+after_angle = (l1_ang - l2_ang)* 180/pi;
+disp(abs(after_angle))
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% 4. Affine and Metric Rectification of the left facade of image 0001
 
@@ -195,10 +251,10 @@ I2 = apply_H(I, H);
 figure; imshow(uint8(I2*255));
 
 % ToDo: compute the transformed lines lr1, lr2, lr3, lr4
-lr1 = inv(transpose(H)) * l1;
-lr2 = inv(transpose(H)) * l2;
-lr3 = inv(transpose(H)) * l3;
-lr4 = inv(transpose(H)) * l4;
+lr1 = transpose(H) \ l1;
+lr2 = transpose(H) \ l2;
+lr3 = transpose(H) \ l3;
+lr4 = transpose(H) \ l4;
 
 % show the transformed lines in the transformed image
 figure;imshow(uint8(I2*255));
