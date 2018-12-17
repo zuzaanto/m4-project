@@ -25,7 +25,7 @@ figure; imshow(I); figure; imshow(uint8(I2));
 %% 1.2. Affinities
 
 % ToDo: generate a matrix H which produces an affine transformation
-
+H = createAffinityH(0, 100, 100, 1, -1.2);
 I2 = apply_H(I, H);
 figure; imshow(I); figure; imshow(uint8(I2));
 
@@ -70,23 +70,38 @@ p7 = [A(i,1) A(i,2) 1]';
 p8 = [A(i,3) A(i,4) 1]';
 
 % ToDo: compute the lines l1, l2, l3, l4, that pass through the different pairs of points
-
+%l1 = [p1', p2'];
+l1 = cross(p1, p2);
+l2 = cross(p3, p4);
+l3 = cross(p5, p6);
+l4 = cross(p7, p8);
 
 % show the chosen lines in the image
 figure;imshow(I);
 hold on;
 t=1:0.1:1000;
-plot(t, -(l1(1)*t + l1(3)) / l1(2), 'y');
-plot(t, -(l2(1)*t + l2(3)) / l2(2), 'y');
-plot(t, -(l3(1)*t + l3(3)) / l3(2), 'y');
+plot(t, -(l1(1)*t + l1(3)) / l1(2), 'r');
+plot(t, -(l2(1)*t + l2(3)) / l2(2), 'b');
+plot(t, -(l3(1)*t + l3(3)) / l3(2), 'g');
 plot(t, -(l4(1)*t + l4(3)) / l4(2), 'y');
 
 % ToDo: compute the homography that affinely rectifies the image
+v1 = cross(l1, l2);
+v2 = cross(l3, l4);
+l = cross(v1, v2);
+l = l / l(3);
+
+H = eye(3,3);
+H(3,:) = l;
 
 I2 = apply_H(I, H);
 figure; imshow(uint8(I2));
 
 % ToDo: compute the transformed lines lr1, lr2, lr3, lr4
+lr1 = inv(transpose(H)) * l1;
+lr2 = inv(transpose(H)) * l2;
+lr3 = inv(transpose(H)) * l3;
+lr4 = inv(transpose(H)) * l4;
 
 % show the transformed lines in the transformed image
 figure;imshow(uint8(I2));
