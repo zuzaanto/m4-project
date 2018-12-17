@@ -92,9 +92,15 @@ if maxY<Ni
     dst = dst(1:paddingTop+round(maxY),:,:);
 end
 if minX>0
+    if minX < 1
+        minX = 1;
+    end
     dst = dst(:,round(minX):end,:);
 end   
 if minY>0
+    if minY < 1
+        minY = 1;
+    end
     dst = dst(round(minY):end,:,:);
 end    
 %dst = fillmissing(dst, 'constant', 0);
