@@ -1,4 +1,4 @@
-function [dst] = apply_H(src,H)
+function [dst, paddingTop, paddingLeft] = apply_H(src,H)
 %APPLY_H Perform transformation using provided homography matrix
 
 src = im2double(src);
@@ -47,11 +47,11 @@ end
 if maxY > Ni
     paddingBottom = round(maxY) - Ni;
 end
+
 newXrange = paddingLeft + Nj + paddingRight;
 newYrange = paddingTop + Ni + paddingBottom;
 srcPadded = NaN(newYrange, newXrange, 3);
 srcPadded(paddingTop+1: paddingTop + Ni, paddingLeft+1:paddingLeft + Nj,:) = src;
-
 
 newNi = size(srcPadded,1);
 newNj = size(srcPadded,2);

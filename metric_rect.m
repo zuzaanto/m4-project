@@ -34,7 +34,7 @@ elseif H(2,2) < 0
 end
 
 
-I3 = apply_H(Ia, H);
+[I3, paddingTop, paddingLeft] = apply_H(Ia, H);
 figure; imshow(uint8(I3*255));
 
 before_angles = [angle_bet_lines(r_l1,r_m1), angle_bet_lines(r_l2,r_m2) ];
@@ -47,10 +47,10 @@ r_m2 = (transpose(H)) \ r_m2;
 % show the transformed lines in the transformed image
 hold on;
 t=1:0.1:1000;
-plot(t, -(r_l1(1)*t + r_l1(3)) / r_l1(2), 'r');
-plot(t, -(r_m1(1)*t + r_m1(3)) / r_m1(2), 'b');
-plot(t, -(r_l2(1)*t + r_l2(3)) / r_l2(2), 'w');
-plot(t, -(r_m2(1)*t + r_m2(3)) / r_m2(2), 'w');
+plot(t + paddingLeft, -(r_l1(1)*t + r_l1(3)) / r_l1(2) + paddingTop, 'r');
+plot(t + paddingLeft, -(r_m1(1)*t + r_m1(3)) / r_m1(2) + paddingTop, 'b');
+plot(t + paddingLeft, -(r_l2(1)*t + r_l2(3)) / r_l2(2) + paddingTop, 'w');
+plot(t + paddingLeft, -(r_m2(1)*t + r_m2(3)) / r_m2(2) + paddingTop, 'w');
 
 
 after_angles = [angle_bet_lines(r_l1,r_m1), angle_bet_lines(r_l2,r_m2) ];

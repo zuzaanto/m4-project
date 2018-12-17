@@ -1,7 +1,5 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Lab 1: Image rectification
-
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% 1. Applying image transformations
 
@@ -20,23 +18,23 @@ I=imread('Data/0005_s.png'); % we have to be in the proper folder
 % createSimilarityH(theta, tx, ty, scale)
 H = createSimilarityH(0.5, 2, 2, 0.5);
 I2 = apply_H(I, H);
-% figure; imshow(I); figure; imshow(uint8(I2*255));
+figure; imshow(I); figure; imshow(uint8(I2*255));
 % figure; 
 % subplot(1,2,1),imshow(I);
 % subplot(1,2,2),imshow(uint8(I2*255));
-imwrite(uint8(I2*255),'similarity05_05.png');
-H = createSimilarityH(0.5, 2, 2, -3);
-I2 = apply_H(I, H);
-% figure; imshow(I); figure; imshow(uint8(I2*255));
-imwrite(uint8(I2*255),'similarity05_-3.png');
-H = createSimilarityH(2.5, 2, 2, 0.5);
-I2 = apply_H(I, H);
-% figure; imshow(I); figure; imshow(uint8(I2*255));
-imwrite(uint8(I2*255),'similarity25_05.png');
-H = createSimilarityH(2.5, 2, 2, -3);
-I2 = apply_H(I, H);
-% figure; imshow(I); figure; imshow(uint8(I2*255));
-imwrite(uint8(I2*255),'similarity25_-3.png');
+% imwrite(uint8(I2*255),'similarity05_05.png');
+% H = createSimilarityH(0.5, 2, 2, -3);
+% I2 = apply_H(I, H);
+% % figure; imshow(I); figure; imshow(uint8(I2*255));
+% imwrite(uint8(I2*255),'similarity05_-3.png');
+% H = createSimilarityH(2.5, 2, 2, 0.5);
+% I2 = apply_H(I, H);
+% % figure; imshow(I); figure; imshow(uint8(I2*255));
+% imwrite(uint8(I2*255),'similarity25_05.png');
+% H = createSimilarityH(2.5, 2, 2, -3);
+% I2 = apply_H(I, H);
+% % figure; imshow(I); figure; imshow(uint8(I2*255));
+% imwrite(uint8(I2*255),'similarity25_-3.png');
 
 
 
@@ -44,9 +42,23 @@ imwrite(uint8(I2*255),'similarity25_-3.png');
 
 % ToDo: generate a matrix H which produces an affine transformation
 % createAffinityH(theta, phi, tx, ty, scalex, scaley)
-H = createAffinityH(0.5, 2.5, 1, 10, 2, 0.2);
+H = createAffinityH(0.4, 0, 1, 1, 1.2, 1);
 I2 = apply_H(I, H);
 figure; imshow(I); figure; imshow(uint8(I2*255));
+% 
+% imwrite(uint8(I2*255),'affinity101121.png');
+% H = createAffinityH(0, 0.4, 1,1, 1.2, 1);
+% I2 = apply_H(I, H);
+% % figure; imshow(I); figure; imshow(uint8(I2*255));
+% imwrite(uint8(I2*255),'affinity011121.png');
+% H = createAffinityH(0.4, 0.4, 1,1,-1,-1.2);
+% I2 = apply_H(I, H);
+% % figure; imshow(I); figure; imshow(uint8(I2*255));
+% imwrite(uint8(I2*255),'affinity1111-1-2.png');
+% H = createAffinityH(0.4, 0.4, 1,1,-1.2,-1);
+% I2 = apply_H(I, H);
+% % figure; imshow(I); figure; imshow(uint8(I2*255));
+% imwrite(uint8(I2*255),'affinity1111-2-1.png');
 
 % ToDo: decompose the affinity in four transformations: two
 % rotations, a scale, and a translation
@@ -63,29 +75,38 @@ display(difference);
 
 % ToDo: verify that the proper sequence of the four previous
 % transformations over the image I produces the same image I2 as before
-% Re1=apply_H(I,translation);
-% imshow(uint8(Re1*255));
-% Re2=apply_H(Re1,rotation2);
-% imshow(uint8(Re1*255));
-% Re3=apply_H(Re2,scale);
-% imshow(uint8(Re3*255));
-% Re4=apply_H(Re3,rotation2);
-% imshow(uint8(Re3*255));
-% Re5=apply_H(Re4,transpose(rotation2));
-% imshow(uint8(Re3*255));
-% Re6=apply_H(Re5,rotation1);
-% figure; 
-% subplot(1,2,1),imshow(uint8(Re6*255));
-% subplot(1,2,2),imshow(uint8(I2*255));
+Re1=apply_H(I,translation);
+imshow(uint8(Re1*255));
+Re2=apply_H(Re1,rotation2);
+imshow(uint8(Re1*255));
+Re3=apply_H(Re2,scale);
+imshow(uint8(Re3*255));
+Re4=apply_H(Re3,rotation2);
+imshow(uint8(Re3*255));
+Re5=apply_H(Re4,transpose(rotation2));
+imshow(uint8(Re3*255));
+Re6=apply_H(Re5,rotation1);
+figure; 
+subplot(1,2,1),imshow(uint8(Re6*255));
+subplot(1,2,2),imshow(uint8(I2*255));
 % imwrite(uint8(I2*255),'recomposed1.png');
 % imwrite(uint8(Re6*255),'recomposed2.png');
 
 %% 1.3 Projective transformations (homographies)
 
 % ToDo: generate a matrix H which produces a projective transformation
+% createProjectiveH(h1,h2,h3,h4,h5,h6,h7,h8)
+Hpro = createProjectiveH(1.1,-0.46,1,0,1,1,0.001,0);
+I2 = apply_H(I, Hpro);
+% imwrite(uint8(I2*255),'proj_0001-0.png');
+% Hpro = createProjectiveH(1.1,-0.46,1,0,1,1,0,0.001);
+% I2 = apply_H(I, Hpro);
+% imwrite(uint8(I2*255),'proj_0-0001.png');
+% Hpro = createProjectiveH(1.1,-0.46,1,0,1,1,0.001,0.001);
+% I2 = apply_H(I, Hpro);
+% imwrite(uint8(I2*255),'proj_0001-0001.png');
 
-I2 = apply_H(I, H);
-figure; imshow(I); figure; imshow(uint8(I2));
+figure; imshow(I); figure; imshow(uint8(I2*255));
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% 2. Affine Rectification
@@ -136,10 +157,12 @@ I2 = apply_H(I, H);
 figure; imshow(uint8(I2*255));
 
 % ToDo: compute the transformed lines lr1, lr2, lr3, lr4
+before_angles = [angle_bet_lines(l1,l2), angle_bet_lines(l3,l4) ];
 lr1 = inv(transpose(H)) * l1;
 lr2 = inv(transpose(H)) * l2;
 lr3 = inv(transpose(H)) * l3;
 lr4 = inv(transpose(H)) * l4;
+after_angles = [angle_bet_lines(lr1,lr2), angle_bet_lines(lr3,lr4) ];
 
 % show the transformed lines in the transformed image
 figure;imshow(uint8(I2*255));
@@ -152,8 +175,8 @@ plot(t, -(lr4(1)*t + lr4(3)) / lr4(2), 'y');
 
 % ToDo: to evaluate the results, compute the angle between the different pair 
 % of lines before and after the image transformation
-
-
+disp('before_angles ='); disp(before_angles)
+disp('after_angles ='); disp(after_angles)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% 3. Metric Rectification
 
@@ -170,8 +193,8 @@ r_l2 = l1;             %r_l2 is perpendicular to r_m2
 r_m2 = l3;
 
 [ before_angles, after_angles ] = metric_rect(I2,H,r_l1,r_m1,r_l2,r_m2 );
-disp(before_angles)
-disp(after_angles)
+disp('before_angles ='); disp(before_angles)
+disp('after_angles ='); disp(after_angles)
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% 4. Affine and Metric Rectification of the left facade of image 0001
@@ -180,8 +203,6 @@ disp(after_angles)
 %       the stratified method (affine + metric). 
 %       Crop the initial image so that only the left facade is visible.
 %       Show the (properly) transformed lines that use in every step.
-clear all
-close all
 
 I=imread('Data/0001_s.png');
 I = I(:,1:477,:); %crop
@@ -254,8 +275,8 @@ r_l2 = l1;             %r_l2 is perpendicular to r_m2
 r_m2 = l3;
 
 [ before_angles, after_angles ] = metric_rect(I2,H_affine,r_l1,r_m1,r_l2,r_m2 );
-disp(before_angles)
-disp(after_angles)
+disp('before_angles ='); disp(before_angles)
+disp('after_angles ='); disp(after_angles)
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% 5. OPTIONAL: Metric Rectification in a single step
