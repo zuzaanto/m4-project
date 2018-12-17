@@ -105,7 +105,7 @@ if minY>0
 end    
 %dst = fillmissing(dst, 'constant', 0);
 dst(isnan(dst)) = 0; %the same as fillmissing 
-dst = dst*255;
+% dst = dst*255;
 %         x_src1 = src(ceil(x_src(1)), ceil(x_src(2));
 %         x_src2 = src(floor(x_src(1)), ceil(x_src(2));
 %         x_src3 = src(ceil(x_src(1)), floor(x_src(2));
