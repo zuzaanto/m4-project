@@ -144,10 +144,10 @@ r_m1 = cross(p2, p3);
 r_l2 = l1;             %r_l2 is perpendicular to r_m2
 r_m2 = l3;
 
-r_l1 = inv(transpose(H)) * r_l1;
-r_m1 = inv(transpose(H)) * r_m1;
-r_l2 = inv(transpose(H)) * r_l2;
-r_m2 = inv(transpose(H)) * r_m2;
+r_l1 = (transpose(H)) \ r_l1;
+r_m1 = (transpose(H)) \ r_m1;
+r_l2 = (transpose(H)) \ r_l2;
+r_m2 = (transpose(H)) \ r_m2;
 
 hold on;
 t=1:0.1:1000;
@@ -164,25 +164,25 @@ b_ = [-r_l1(2)*r_m1(2) , -r_l2(2)*r_m2(2)]';
 s_vec = linsolve(A_,b_);
 disp(s_vec)
 S_mat = [s_vec(1),s_vec(2);s_vec(2),1];
-
+i
 A = chol(S_mat);
 disp(A)
 H = zeros(3,3);
-H(1:2,1:2) = inv(A);
+H(1:2,1:2) = inv(A');
 H(3,3) = 1;
 
 I3 = apply_H(I2, H);
 figure; imshow(uint8(I3*255));
 
-l1_ang = atan(((-(r_l2(1)*100 + r_l2(3)) / r_l2(2)) + ((r_l2(3)) / r_l2(2)))/(100));
-l2_ang = atan(((-(r_m2(1)*100 + r_m2(3)) / r_m2(2)) +((r_m2(3)) / r_m2(2)))/(100));
+l1_ang = atan(((-(r_l2(1)*1000 + r_l2(3)) / r_l2(2)) + ((r_l2(3)) / r_l2(2)))/(1000));
+l2_ang = atan(((-(r_m2(1)*1000 + r_m2(3)) / r_m2(2)) +((r_m2(3)) / r_m2(2)))/(1000));
 before_angle = (l1_ang - l2_ang)* 180/pi;
 disp(abs(before_angle))
 
-r_l1 = inv(transpose(H)) * r_l1;
-r_m1 = inv(transpose(H)) * r_m1;
-r_l2 = inv(transpose(H)) * r_l2;
-r_m2 = inv(transpose(H)) * r_m2;
+r_l1 = (transpose(H)) \ r_l1;
+r_m1 = (transpose(H)) \ r_m1;
+r_l2 = (transpose(H)) \ r_l2;
+r_m2 = (transpose(H)) \ r_m2;
 
 % show the transformed lines in the transformed image
 hold on;
@@ -192,8 +192,9 @@ plot(t, -(r_m1(1)*t + r_m1(3)) / r_m1(2), 'b');
 plot(t, -(r_l2(1)*t + r_l2(3)) / r_l2(2), 'w');
 plot(t, -(r_m2(1)*t + r_m2(3)) / r_m2(2), 'w');
 
-l1_ang = atan(((-(r_l2(1)*100 + r_l2(3)) / r_l2(2)) + ((r_l2(3)) / r_l2(2)))/(100));
-l2_ang = atan(((-(r_m2(1)*100 + r_m2(3)) / r_m2(2)) +((r_m2(3)) / r_m2(2)))/(100));
+l1_ang = atan(((-(r_l2(1)*1000 + r_l2(3)) / r_l2(2)) + ((r_l2(3)) / r_l2(2)))/(1000));
+l2_ang = atan(((-(r_m2(1)*1000 + r_m2(3)) / r_m2(2)) +((r_m2(3)) / r_m2(2)))/(1000));
+
 after_angle = (l1_ang - l2_ang)* 180/pi;
 disp(abs(after_angle))
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
