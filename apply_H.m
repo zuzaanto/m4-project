@@ -11,8 +11,9 @@ src_coord = zeros(3,1);
 dst_coord_float = zeros(3,4);
 % compute coordinates of the corners of the transformed image
 index = 1;
-for i=1:Ni-1:Ni
-    for j=1:Nj-1:Nj
+for i=1:Ni
+    for j=1:Nj
+        if(~isnan(src(i,j)))
         src_coord(1) = j;
         src_coord(2) = i;
         src_coord(3) = 1;
@@ -21,6 +22,7 @@ for i=1:Ni-1:Ni
         % the affine rectification:
         dst_coord_float(:,index) = point / point(3); 
         index = index+1;
+        end
     end
 end
 minX = min(dst_coord_float(1,:));
@@ -47,7 +49,7 @@ if maxY > Ni
 end
 newXrange = paddingLeft + Nj + paddingRight;
 newYrange = paddingTop + Ni + paddingBottom;
-srcPadded = zeros(newYrange, newXrange, 3);
+srcPadded = NaN(newYrange, newXrange, 3);
 srcPadded(paddingTop+1: paddingTop + Ni, paddingLeft+1:paddingLeft + Nj,:) = src;
 
 
@@ -85,6 +87,14 @@ dst(:,:,1) = interp2(Xsrc,Ysrc, srcPadded(:,:,1), Xsrc_float, Ysrc_float);
 dst(:,:,2) = interp2(Xsrc,Ysrc, srcPadded(:,:,2), Xsrc_float, Ysrc_float); 
 dst(:,:,3) = interp2(Xsrc,Ysrc, srcPadded(:,:,3), Xsrc_float, Ysrc_float); 
 
+% dst(isnan(dst)) = 0;
+
+imwrite(uint8(src*255),'srcPadded.png');
+imwrite(uint8(srcPadded*255),'srcPadded.png');
+
+imwrite(uint8(dst*255),'rotated.png');
+
+
 if maxX<Nj
     dst = dst(:,1:paddingLeft + round(maxX),:);
 end
@@ -104,7 +114,10 @@ if minY>0
     dst = dst(round(minY):end,:,:);
 end    
 %dst = fillmissing(dst, 'constant', 0);
-dst(isnan(dst)) = 0; %the same as fillmissing 
+imwrite(uint8(dst*255),'cropped.png');
+
+
+%the same as fillmissing 
 % dst = dst*255;
 %         x_src1 = src(ceil(x_src(1)), ceil(x_src(2));
 %         x_src2 = src(floor(x_src(1)), ceil(x_src(2));
@@ -112,4 +125,3 @@ dst(isnan(dst)) = 0; %the same as fillmissing
 %         x_src4 = src(floor(x_src(1)), floor(x_src(2));
 
 end
-

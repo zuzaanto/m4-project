@@ -17,6 +17,7 @@ b_ = [-r_l1(2)*r_m1(2) , -r_l2(2)*r_m2(2)]';
 
 
 s_vec = linsolve(A_,b_);
+
 disp(s_vec)
 S_mat = [s_vec(1),s_vec(2);s_vec(2),1];
 
@@ -25,6 +26,13 @@ disp(A)
 H = zeros(3,3);
 H(1:2,1:2) = inv(A)';
 H(3,3) = 1;
+
+if H(1,1) < 0
+    H(1,1) = -H(1,1);
+elseif H(2,2) < 0
+    H(2,2) = -H(2,2);
+end
+
 
 I3 = apply_H(Ia, H);
 figure; imshow(uint8(I3*255));

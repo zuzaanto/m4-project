@@ -1,5 +1,5 @@
 function [H] = createSimilarityH(theta,tx, ty, scale)
-%CREATEH create homography matrix from rotation, translation and scale
+%CREATESIMILARITYH create homography matrix from rotation, translation and scale
 
 H = zeros(3,3);
 
@@ -16,4 +16,3 @@ H(2,3) = ty;
 H(3,3) = 1;
 
 end
-

@@ -17,43 +17,68 @@
 I=imread('Data/0005_s.png'); % we have to be in the proper folder
 
 % ToDo: generate a matrix H which produces a similarity transformation
-H = createSimilarityH(-4.0, 100, 100, 0.1);
+% createSimilarityH(theta, tx, ty, scale)
+H = createSimilarityH(0.5, 2, 2, 0.5);
 I2 = apply_H(I, H);
-% figure; imshow(I); figure; imshow(uint8(I2));
+% figure; imshow(I); figure; imshow(uint8(I2*255));
+% figure; 
+% subplot(1,2,1),imshow(I);
+% subplot(1,2,2),imshow(uint8(I2*255));
+imwrite(uint8(I2*255),'similarity05_05.png');
+H = createSimilarityH(0.5, 2, 2, -3);
+I2 = apply_H(I, H);
+% figure; imshow(I); figure; imshow(uint8(I2*255));
+imwrite(uint8(I2*255),'similarity05_-3.png');
+H = createSimilarityH(2.5, 2, 2, 0.5);
+I2 = apply_H(I, H);
+% figure; imshow(I); figure; imshow(uint8(I2*255));
+imwrite(uint8(I2*255),'similarity25_05.png');
+H = createSimilarityH(2.5, 2, 2, -3);
+I2 = apply_H(I, H);
+% figure; imshow(I); figure; imshow(uint8(I2*255));
+imwrite(uint8(I2*255),'similarity25_-3.png');
+
 
 
 %% 1.2. Affinities
 
 % ToDo: generate a matrix H which produces an affine transformation
-H = createAffinityH(0, 100, 100, 1, -1.2);
+% createAffinityH(theta, phi, tx, ty, scalex, scaley)
+H = createAffinityH(0.5, 2.5, 1, 10, 2, 0.2);
 I2 = apply_H(I, H);
-% figure; imshow(I); figure; imshow(uint8(I2*255));
+figure; imshow(I); figure; imshow(uint8(I2*255));
 
 % ToDo: decompose the affinity in four transformations: two
 % rotations, a scale, and a translation
+[rotation1, rotation2, scale, translation] = decomposeAffinity(H);
 
-[rotation1,rotation2,scale,translation]=decomposeAffinity(H);
 
 % ToDo: verify that the product of the four previous transformations
 % produces the same matrix H as above
+
 
 Hrecomp=translation*rotation1*scale*rotation2;
 difference=H-Hrecomp;
 display(difference);
 
-
 % ToDo: verify that the proper sequence of the four previous
 % transformations over the image I produces the same image I2 as before
-Re5=apply_H(I,translation);
-Re1=apply_H(Re5,rotation2);
-Re2=apply_H(Re1,scale);
-Re3=apply_H(Re2,rotation2);
-Re3=apply_H(Re3,transpose(rotation2));
-Re4=apply_H(Re3,rotation1);
-figure; 
-subplot(1,2,1),imshow(uint8(Re4*255));
-subplot(1,2,2),imshow(uint8(I2*255));
-
+% Re1=apply_H(I,translation);
+% imshow(uint8(Re1*255));
+% Re2=apply_H(Re1,rotation2);
+% imshow(uint8(Re1*255));
+% Re3=apply_H(Re2,scale);
+% imshow(uint8(Re3*255));
+% Re4=apply_H(Re3,rotation2);
+% imshow(uint8(Re3*255));
+% Re5=apply_H(Re4,transpose(rotation2));
+% imshow(uint8(Re3*255));
+% Re6=apply_H(Re5,rotation1);
+% figure; 
+% subplot(1,2,1),imshow(uint8(Re6*255));
+% subplot(1,2,2),imshow(uint8(I2*255));
+% imwrite(uint8(I2*255),'recomposed1.png');
+% imwrite(uint8(Re6*255),'recomposed2.png');
 
 %% 1.3 Projective transformations (homographies)
 
@@ -139,14 +164,15 @@ plot(t, -(lr4(1)*t + lr4(3)) / lr4(2), 'y');
 %       the metric rectification) with the chosen lines printed on it.
 %       Compute also the angles between the pair of lines before and after
 %       rectification.
-r_m1 = l1;             %r_l2 is perpendicular to r_m2
-r_l1 = l3;
-r_m2 = cross(p1, p4);  %r_l1 is perpendicular to r_m1
-r_l2 = cross(p2, p3);
+r_l1 = cross(p1, p4);  %r_l1 is perpendicular to r_m1
+r_m1 = cross(p2, p3);
+r_l2 = l1;             %r_l2 is perpendicular to r_m2
+r_m2 = l3;
 
 [ before_angles, after_angles ] = metric_rect(I2,H,r_l1,r_m1,r_l2,r_m2 );
 disp(before_angles)
 disp(after_angles)
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% 4. Affine and Metric Rectification of the left facade of image 0001
 
@@ -154,6 +180,8 @@ disp(after_angles)
 %       the stratified method (affine + metric). 
 %       Crop the initial image so that only the left facade is visible.
 %       Show the (properly) transformed lines that use in every step.
+clear all
+close all
 
 I=imread('Data/0001_s.png');
 I = I(:,1:477,:); %crop
@@ -172,6 +200,7 @@ i = 614;
 p7 = [A(i,1) A(i,2) 1]';
 p8 = [A(i,3) A(i,4) 1]';
 
+%affine rectification
 
 l1 = cross(p1, p2);
 l2 = cross(p3, p4);
@@ -185,54 +214,49 @@ plot(t, -(l1(1)*t + l1(3)) / l1(2), 'r');
 plot(t, -(l2(1)*t + l2(3)) / l2(2), 'b');
 plot(t, -(l3(1)*t + l3(3)) / l3(2), 'g');
 plot(t, -(l4(1)*t + l4(3)) / l4(2), 'y');
+text(p1(1), p1(2), 'p1', 'Color', 'red');
+text(p2(1), p2(2), 'p2', 'Color', 'red');
+text(p3(1), p3(2), 'p3', 'Color', 'red');
+text(p4(1), p4(2), 'p4', 'Color', 'red');
+text(p5(1), p5(2), 'p5', 'Color', 'red');
+text(p6(1), p6(2), 'p6', 'Color', 'red');
+text(p7(1), p7(2), 'p7', 'Color', 'red');
+text(p8(1), p8(2), 'p8', 'Color', 'red');
+hold off;
 
-%homography
 v1 = cross(l1, l2);
 v2 = cross(l3, l4);
 l = cross(v1, v2);
 l = l / l(3);
 
-H = eye(3,3);
-H(3,:) = l;
+H_affine = eye(3,3);
+H_affine(3,:) = l;
 
-% ... metric rectification ...
+lr1 = inv(transpose(H_affine)) * l1;
+lr2 = inv(transpose(H_affine)) * l2;
+lr3 = inv(transpose(H_affine)) * l3;
+lr4 = inv(transpose(H_affine)) * l4;
 
-
-I2 = apply_H(I, H);
+I2 = apply_H(I, H_affine);
 figure; imshow(uint8(I2*255));
-
-% ToDo: compute the transformed lines lr1, lr2, lr3, lr4
-lr1 = transpose(H) \ l1;
-lr2 = transpose(H) \ l2;
-lr3 = transpose(H) \ l3;
-lr4 = transpose(H) \ l4;
-
-% show the transformed lines in the transformed image
-figure;imshow(uint8(I2*255));
 hold on;
 t=1:0.1:1000;
-plot(t, -(lr1(1)*t + lr1(3)) / lr1(2), 'y');
-plot(t, -(lr2(1)*t + lr2(3)) / lr2(2), 'y');
-plot(t, -(lr3(1)*t + lr3(3)) / lr3(2), 'y');
+plot(t, -(lr1(1)*t + lr1(3)) / lr1(2), 'r');
+plot(t, -(lr2(1)*t + lr2(3)) / lr2(2), 'b');
+plot(t, -(lr3(1)*t + lr3(3)) / lr3(2), 'g');
 plot(t, -(lr4(1)*t + lr4(3)) / lr4(2), 'y');
+hold off;
 
+%metric rectification
+r_l1 = cross(p1, p4);  %r_l1 is perpendicular to r_m1
+r_m1 = cross(p2, p3);
+r_l2 = l1;             %r_l2 is perpendicular to r_m2
+r_m2 = l3;
 
-
-
-
-r_m1 = cross(p1, p4);  %r_l1 is perpendicular to r_m1
-r_l1 = cross(p2, p3);
-r_m2 = l1;             %r_l2 is perpendicular to r_m2
-r_l2 = l3;
-
-[ before_angles, after_angles ] = metric_rect(I2,H,r_l1,r_m1,r_l2,r_m2 );
+[ before_angles, after_angles ] = metric_rect(I2,H_affine,r_l1,r_m1,r_l2,r_m2 );
 disp(before_angles)
 disp(after_angles)
-
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% 5. OPTIONAL: Metric Rectification in a single step
 % Use 5 pairs of orthogonal lines (pages 55-57, Hartley-Zisserman book)
-
-
-
