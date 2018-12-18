@@ -20,23 +20,23 @@ I=imread('Data/0005_s.png'); % we have to be in the proper folder
 % createSimilarityH(theta, tx, ty, scale)
 H = createSimilarityH(0.5, 2, 2, 0.5);
 I2 = apply_H(I, H);
-% figure; imshow(I); figure; imshow(uint8(I2*255));
+figure; imshow(I); figure; imshow(uint8(I2*255));
 % figure; 
 % subplot(1,2,1),imshow(I);
 % subplot(1,2,2),imshow(uint8(I2*255));
-imwrite(uint8(I2*255),'similarity05_05.png');
-H = createSimilarityH(0.5, 2, 2, -3);
-I2 = apply_H(I, H);
-% figure; imshow(I); figure; imshow(uint8(I2*255));
-imwrite(uint8(I2*255),'similarity05_-3.png');
-H = createSimilarityH(2.5, 2, 2, 0.5);
-I2 = apply_H(I, H);
-% figure; imshow(I); figure; imshow(uint8(I2*255));
-imwrite(uint8(I2*255),'similarity25_05.png');
-H = createSimilarityH(2.5, 2, 2, -3);
-I2 = apply_H(I, H);
-% figure; imshow(I); figure; imshow(uint8(I2*255));
-imwrite(uint8(I2*255),'similarity25_-3.png');
+% imwrite(uint8(I2*255),'similarity05_05.png');
+% H = createSimilarityH(0.5, 2, 2, -3);
+% I2 = apply_H(I, H);
+% % figure; imshow(I); figure; imshow(uint8(I2*255));
+% imwrite(uint8(I2*255),'similarity05_-3.png');
+% H = createSimilarityH(2.5, 2, 2, 0.5);
+% I2 = apply_H(I, H);
+% % figure; imshow(I); figure; imshow(uint8(I2*255));
+% imwrite(uint8(I2*255),'similarity25_05.png');
+% H = createSimilarityH(2.5, 2, 2, -3);
+% I2 = apply_H(I, H);
+% % figure; imshow(I); figure; imshow(uint8(I2*255));
+% imwrite(uint8(I2*255),'similarity25_-3.png');
 
 
 
@@ -44,9 +44,23 @@ imwrite(uint8(I2*255),'similarity25_-3.png');
 
 % ToDo: generate a matrix H which produces an affine transformation
 % createAffinityH(theta, phi, tx, ty, scalex, scaley)
-H = createAffinityH(0.5, 2.5, 1, 10, 2, 0.2);
+H = createAffinityH(0.4, 0, 1, 1, 1.2, 1);
 I2 = apply_H(I, H);
 figure; imshow(I); figure; imshow(uint8(I2*255));
+% 
+% imwrite(uint8(I2*255),'affinity101121.png');
+% H = createAffinityH(0, 0.4, 1,1, 1.2, 1);
+% I2 = apply_H(I, H);
+% % figure; imshow(I); figure; imshow(uint8(I2*255));
+% imwrite(uint8(I2*255),'affinity011121.png');
+% H = createAffinityH(0.4, 0.4, 1,1,-1,-1.2);
+% I2 = apply_H(I, H);
+% % figure; imshow(I); figure; imshow(uint8(I2*255));
+% imwrite(uint8(I2*255),'affinity1111-1-2.png');
+% H = createAffinityH(0.4, 0.4, 1,1,-1.2,-1);
+% I2 = apply_H(I, H);
+% % figure; imshow(I); figure; imshow(uint8(I2*255));
+% imwrite(uint8(I2*255),'affinity1111-2-1.png');
 
 % ToDo: decompose the affinity in four transformations: two
 % rotations, a scale, and a translation
@@ -63,29 +77,38 @@ display(difference);
 
 % ToDo: verify that the proper sequence of the four previous
 % transformations over the image I produces the same image I2 as before
-% Re1=apply_H(I,translation);
-% imshow(uint8(Re1*255));
-% Re2=apply_H(Re1,rotation2);
-% imshow(uint8(Re1*255));
-% Re3=apply_H(Re2,scale);
-% imshow(uint8(Re3*255));
-% Re4=apply_H(Re3,rotation2);
-% imshow(uint8(Re3*255));
-% Re5=apply_H(Re4,transpose(rotation2));
-% imshow(uint8(Re3*255));
-% Re6=apply_H(Re5,rotation1);
-% figure; 
-% subplot(1,2,1),imshow(uint8(Re6*255));
-% subplot(1,2,2),imshow(uint8(I2*255));
+Re1=apply_H(I,translation);
+imshow(uint8(Re1*255));
+Re2=apply_H(Re1,rotation2);
+imshow(uint8(Re1*255));
+Re3=apply_H(Re2,scale);
+imshow(uint8(Re3*255));
+Re4=apply_H(Re3,rotation2);
+imshow(uint8(Re3*255));
+Re5=apply_H(Re4,transpose(rotation2));
+imshow(uint8(Re3*255));
+Re6=apply_H(Re5,rotation1);
+figure; 
+subplot(1,2,1),imshow(uint8(Re6*255));
+subplot(1,2,2),imshow(uint8(I2*255));
 % imwrite(uint8(I2*255),'recomposed1.png');
 % imwrite(uint8(Re6*255),'recomposed2.png');
 
 %% 1.3 Projective transformations (homographies)
 
 % ToDo: generate a matrix H which produces a projective transformation
+% createProjectiveH(h1,h2,h3,h4,h5,h6,h7,h8)
+Hpro = createProjectiveH(1.1,-0.46,1,0,1,1,0.001,0);
+I2 = apply_H(I, Hpro);
+% imwrite(uint8(I2*255),'proj_0001-0.png');
+% Hpro = createProjectiveH(1.1,-0.46,1,0,1,1,0,0.001);
+% I2 = apply_H(I, Hpro);
+% imwrite(uint8(I2*255),'proj_0-0001.png');
+% Hpro = createProjectiveH(1.1,-0.46,1,0,1,1,0.001,0.001);
+% I2 = apply_H(I, Hpro);
+% imwrite(uint8(I2*255),'proj_0001-0001.png');
 
-I2 = apply_H(I, H);
-figure; imshow(I); figure; imshow(uint8(I2));
+figure; imshow(I); figure; imshow(uint8(I2*255));
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% 2. Affine Rectification
