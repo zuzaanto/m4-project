@@ -16,7 +16,10 @@ for i=1:Ni-1:Ni
         src_coord(1) = j;
         src_coord(2) = i;
         src_coord(3) = 1;
-        dst_coord_float(:,index) = H*src_coord;
+        point = H*src_coord;
+        % normalized coords, otherwise the padding is wrong when we do
+        % the affine rectification:
+        dst_coord_float(:,index) = point / point(3); 
         index = index+1;
     end
 end
@@ -57,8 +60,7 @@ dst_coord = zeros(3,1);
 % src_coord = zeros(1,Ni*Nj);
 
 [Xsrc, Ysrc] = meshgrid(-paddingLeft + 1:Nj + paddingRight, -paddingTop + 1:Ni + paddingBottom);
-[Xsrc_float, Ysrc_float] = meshgrid(1:newNj, 1:newNi);
-
+[Xsrc_float, Ysrc_float, Wsrc_float] = meshgrid(1:newNj, 1:newNi, 1);
 
 for i=1:newNi
     for j=1:newNj
@@ -68,8 +70,15 @@ for i=1:newNi
         src_coord_float = (H)\dst_coord;
         Xsrc_float(i,j) = src_coord_float(1);
         Ysrc_float(i,j) = src_coord_float(2);
+        Wsrc_float(i,j) = src_coord_float(3);  %used to normalzie the coords
+        
     end
 end
+
+% normalized coords, otherwise the affine rectification won't work
+Xsrc_float = Xsrc_float./Wsrc_float; 
+Ysrc_float = Ysrc_float./Wsrc_float;
+
 % figure; imshow(uint8(srcPadded*255));
 %interpolation for each channel: r
 dst(:,:,1) = interp2(Xsrc,Ysrc, srcPadded(:,:,1), Xsrc_float, Ysrc_float);
@@ -83,13 +92,20 @@ if maxY<Ni
     dst = dst(1:paddingTop+round(maxY),:,:);
 end
 if minX>0
+    if minX < 1
+        minX = 1;
+    end
     dst = dst(:,round(minX):end,:);
 end   
 if minY>0
+    if minY < 1
+        minY = 1;
+    end
     dst = dst(round(minY):end,:,:);
 end    
-dst = fillmissing(dst, 'constant', 0);
-dst = dst*255;
+%dst = fillmissing(dst, 'constant', 0);
+dst(isnan(dst)) = 0; %the same as fillmissing 
+% dst = dst*255;
 %         x_src1 = src(ceil(x_src(1)), ceil(x_src(2));
 %         x_src2 = src(floor(x_src(1)), ceil(x_src(2));
 %         x_src3 = src(ceil(x_src(1)), floor(x_src(2));
