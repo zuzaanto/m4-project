@@ -42,9 +42,10 @@ imwrite(uint8(I2*255),'similarity25_-3.png');
 %% 1.2. Affinities
 
 % ToDo: generate a matrix H which produces an affine transformation
-H = createAffinityH(0, 100, 100, 1, -1.2);
+% createAffinityH(theta, phi, tx, ty, scalex, scaley)
+H = createAffinityH(0.5, 2.5, 1, 10, 2, 0.2);
 I2 = apply_H(I, H);
-% figure; imshow(I); figure; imshow(uint8(I2*255));
+figure; imshow(I); figure; imshow(uint8(I2*255));
 
 % ToDo: decompose the affinity in four transformations: two
 % rotations, a scale, and a translation
@@ -58,25 +59,24 @@ Hrecomp=translation*rotation1*scale*rotation2;
 difference=H-Hrecomp;
 display(difference);
 
-figure;
 % ToDo: verify that the proper sequence of the four previous
 % transformations over the image I produces the same image I2 as before
-Re1=apply_H(I,translation);
-imshow(uint8(Re1*255));
-Re2=apply_H(Re1,rotation2);
-imshow(uint8(Re1*255));
-Re3=apply_H(Re2,scale);
-imshow(uint8(Re3*255));
-Re4=apply_H(Re3,rotation2);
-imshow(uint8(Re3*255));
-Re5=apply_H(Re4,transpose(rotation2));
-imshow(uint8(Re3*255));
-Re6=apply_H(Re5,rotation1);
+% Re1=apply_H(I,translation);
+% imshow(uint8(Re1*255));
+% Re2=apply_H(Re1,rotation2);
+% imshow(uint8(Re1*255));
+% Re3=apply_H(Re2,scale);
+% imshow(uint8(Re3*255));
+% Re4=apply_H(Re3,rotation2);
+% imshow(uint8(Re3*255));
+% Re5=apply_H(Re4,transpose(rotation2));
+% imshow(uint8(Re3*255));
+% Re6=apply_H(Re5,rotation1);
 % figure; 
 % subplot(1,2,1),imshow(uint8(Re6*255));
 % subplot(1,2,2),imshow(uint8(I2*255));
-imwrite(uint8(I2*255),'recomposed1.png');
-imwrite(uint8(Re6*255),'recomposed2.png');
+% imwrite(uint8(I2*255),'recomposed1.png');
+% imwrite(uint8(Re6*255),'recomposed2.png');
 
 %% 1.3 Projective transformations (homographies)
 
