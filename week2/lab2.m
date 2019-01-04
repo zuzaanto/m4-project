@@ -12,13 +12,14 @@ imargb = imread('Data/llanes/llanes_a.jpg');
 imbrgb = imread('Data/llanes/llanes_b.jpg');
 imcrgb = imread('Data/llanes/llanes_c.jpg');
 
-imargb = imread('Data/castle_int/0016_s.png');
-imbrgb = imread('Data/castle_int/0015_s.png');
-imcrgb = imread('Data/castle_int/0014_s.png');
+% imargb = imread('Data/castle_int/0016_s.png');
+% imbrgb = imread('Data/castle_int/0015_s.png');
+% imcrgb = imread('Data/castle_int/0014_s.png');
 
 % imargb = imread('Data/aerial/site13/frame00000.png');
 % imbrgb = imread('Data/aerial/site13/frame00002.png');
 % imcrgb = imread('Data/aerial/site13/frame00003.png');
+
 
 ima = sum(double(imargb), 3) / 3 / 255;
 imb = sum(double(imbrgb), 3) / 3 / 255;
@@ -91,10 +92,12 @@ vgg_gui_H(imbrgb, imcrgb, Hbc);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% 3. Build the mosaic
 
-corners = [-400 1200 -100 650];
-% iwb = apply_H_v2(imbrgb, ?? , corners);   % ToDo: complete the call to the function
-% iwa = apply_H_v2(imargb, ??, corners);    % ToDo: complete the call to the function
-% iwc = apply_H_v2(imcrgb, ??, corners);    % ToDo: complete the call to the function
+corners = [-400 1200 -100 650]; % use these corners for llanes and castle
+%corners = [-300 1400 -100 1000]; % use these corners for the aerial pictures
+
+iwb = apply_H_v2(imbrgb, eye(3), corners);   % ToDo: complete the call to the function
+iwa = apply_H_v2(imargb, Hab, corners);    % ToDo: complete the call to the function
+iwc = apply_H_v2(imcrgb, inv(Hbc), corners);    % ToDo: complete the call to the function
 
 figure;
 imshow(max(iwc, max(iwb, iwa)));%image(max(iwc, max(iwb, iwa)));axis off;
