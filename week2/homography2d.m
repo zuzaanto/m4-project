@@ -28,10 +28,12 @@ A(2:2:2*n,9) = v;
 
 [evec,~] = eig(A'*A);
 H = reshape(evec(:,1),[3,3])';
-H = H/H(end); % to achieve H(3,3) = 1
+
 
 % denormalise homography
 H = T2\H*T1;
+
+H = H/H(end); % to achieve H(3,3) = 1
 
 end
 
