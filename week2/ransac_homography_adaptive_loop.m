@@ -40,10 +40,7 @@ function idx_inliers = compute_inliers(H, x1, x2, th)
         return
     end
     
-
     % compute the symmetric geometric error
-    Hx1 = H*x1;
-    Hx2 = H\x2;
     d2 = sum((H*x1-x2).^2 + (x1-H\x2).^2);
     idx_inliers = find(d2 < th.^2);
 
