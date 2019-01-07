@@ -114,7 +114,7 @@ title('Mosaic A-B-C');
 
 % Homography ab
 
-% x = ...;  %ToDo: set the non-homogeneous point coordinates of the 
+% x = ...;  %       ToDo: set the non-homogeneous point coordinates of the 
 % xp = ...; %      point correspondences we will refine with the geometric method
 Xobs = [ x(:) ; xp(:) ];     % The column vector of observed values (x and x')
 P0 = [ Hab(:) ; x(:) ];      % The parameters or independent variables
