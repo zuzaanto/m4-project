@@ -319,10 +319,74 @@ end
 %% 6. OPTIONAL: Detect the UPF logo in the two UPF images using the 
 %%              DLT algorithm (folder "logos").
 %%              Interpret and comment the results.
+clear all;
+close all;
+
+im = imread('Data/logos/UPFstand.jpg');
+imlogo = imread('Data/logos/logoUPF.png');
+
+im = sum(double(im), 3) / 3 / 255;
+imlogo = sum(double(imlogo), 3) / 3 / 255;
+
+[points_a, desc_a] = sift(im, 'Threshold', 0.001);
+[points_b, desc_b] = sift(imlogo, 'Threshold', 0.001);
+
+matches_ab = siftmatch(desc_a, desc_b);
+figure;
+plotmatches(im, imlogo, points_a(1:2,:), points_b(1:2,:), matches_ab, 'Stacking', 'v');
+
+%ransac+dlt
+
+th = 20;
+xab_a = [points_a(1:2, matches_ab(1,:)); ones(1, length(matches_ab))];
+xab_b = [points_b(1:2, matches_ab(2,:)); ones(1, length(matches_ab))];
+[H, inliers_ab] = ransac_homography_adaptive_loop(xab_b, xab_a, th, 10000000); 
+
+figure;
+plotmatches(im, imlogo, points_a(1:2,:), points_b(1:2,:), ...
+    matches_ab(:,inliers_ab), 'Stacking', 'v');
+
+% transform the corners of the logo, so we can plot the borders of it in the image
+logo_size = size(imlogo);
+corners = [[0, 0, 1]', [logo_size(1), 0, 1]', [0, logo_size(2), 1]', [logo_size(1), logo_size(2), 1]'];
+corners_transformed = H*corners;
+corners_transformed(:,1) = corners_transformed(:,1) ./ corners_transformed(3, 1);
+corners_transformed(:,2) = corners_transformed(:,2) ./ corners_transformed(3, 2);
+corners_transformed(:,3) = corners_transformed(:,3) ./ corners_transformed(3, 3);
+corners_transformed(:,4) = corners_transformed(:,4) ./ corners_transformed(3, 4);
+
+figure;
+imshow(im);
+hold on;
+line([corners_transformed(1,1), corners_transformed(1,2)], [corners_transformed(2,1), corners_transformed(2,2)]);
+line([corners_transformed(1,2), corners_transformed(1,4)], [corners_transformed(2,2), corners_transformed(2,4)]);
+line([corners_transformed(1,4), corners_transformed(1,3)], [corners_transformed(2,4), corners_transformed(2,3)]);
+line([corners_transformed(1,3), corners_transformed(1,1)], [corners_transformed(2,3), corners_transformed(2,1)]);
+
+scatter(corners_transformed(1,1), corners_transformed(2,1),'red');
+scatter(corners_transformed(1,2), corners_transformed(2,2),'green');
+scatter(corners_transformed(1,3), corners_transformed(2,3),'blue');
+scatter(corners_transformed(1,4), corners_transformed(2,4),'yellow');
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% 7. OPTIONAL: Replace the logo of the UPF by the master logo
 %%              in one of the previous images using the DLT algorithm.
 
+im_original = imread('Data/logos/UPFstand.jpg');
+imlogo_master = imread('Data/logos/logo_master.png');
+
+%resize the logo to the size of the other logo, so we can use H to
+%transform it
+imlogo_master = imresize(imlogo_master, size(imlogo)); 
+
+size_image = size(im_original);
+corners = [1, size_image(2), 1, size_image(1)];
+logo_master_trans = apply_H_v2(imlogo_master, H, corners);
+
+im_original = im_original - logo_master_trans*255; %remove the logo from the original image
+
+figure;
+imshow(im_original + logo_master_trans);
 
 
