@@ -376,9 +376,6 @@ scatter(corners_transformed(1,4), corners_transformed(2,4),'yellow');
 im_original = imread('Data/logos/UPFstand.jpg');
 imlogo_master = imread('Data/logos/logo_master.png');
 
-distance1 = pdist([corners_transformed(1:2,1),corners_transformed(1:2,3)], 'euclidean');
-distance2 = pdist([corners_transformed(1:2,3),corners_transformed(1:2,4)], 'euclidean');
-
 %resize the logo to the size of the other logo, so we can use H to
 %transform it
 imlogo_master = imresize(imlogo_master, size(imlogo)); 
@@ -391,9 +388,5 @@ im_original = im_original - logo_master_trans*255; %remove the logo from the ori
 
 figure;
 imshow(im_original + logo_master_trans);
-
-disp(size(logo_master_trans));
-disp(size(im_original));
-
 
 
