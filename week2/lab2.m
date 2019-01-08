@@ -114,10 +114,11 @@ title('Mosaic A-B-C');
 
 % Homography ab
 
-% x = ...;  %       ToDo: set the non-homogeneous point coordinates of the 
-% xp = ...; %      point correspondences we will refine with the geometric method
-Xobs = [ x(:) ; xp(:) ];     % The column vector of observed values (x and x')
-P0 = [ Hab(:) ; x(:) ];      % The parameters or independent variables
+x  = points_a( 1:2, matches_ab(1, inliers_ab));  %ToDo: set the non-homogeneous point coordinates of the 
+xp = points_b( 1:2, matches_ab(2, inliers_ab));  %point correspondences we will refine with the geometric method
+
+Xobs = [ x(:)   ; xp(:) ];     % The column vector of observed values (x and x')
+P0   = [ Hab(:) ; x(:)  ];      % The parameters or independent variables
 
 Y_initial = gs_errfunction( P0, Xobs ); % ToDo: create this function that we need to pass to the lsqnonlin function
 % NOTE: gs_errfunction should return E(X) and not the sum-of-squares E=sum(E(X).^2)) that we want to minimize. 
@@ -140,6 +141,14 @@ fprintf(1, 'Gold standard reproj error initial %f, final %f\n', err_initial, err
 % ToDo: compute the points xhat and xhatp which are the correspondences
 % returned by the refinement with the Gold Standard algorithm
 
+nPoints = size(P(10:end),1)/2;
+
+xhat  = reshape(P(10:end), [2,nPoints]);
+xhat  = [xhat ; ones(1,nPoints)];
+xhatp = Hab_r*xhat;
+xhat  = euclid(xhat);
+xhatp = euclid(xhatp);
+
 figure;
 imshow(imargb);%image(imargb);
 hold on;
@@ -153,14 +162,39 @@ plot(xp(1,:), xp(2,:),'+y');
 plot(xhatp(1,:), xhatp(2,:),'+c');
 
 %%  Homography bc
-
 % ToDo: refine the homography bc with the Gold Standard algorithm
+x  = points_b(1:2, matches_bc(1,inliers_bc)); 
+xp = points_c(1:2, matches_bc(2,inliers_bc));
+Xobs = [ x(:) ; xp(:) ];    
+P0   = [ Hbc(:) ; x(:) ];      
+
+Y_initial = gs_errfunction( P0, Xobs ); 
+err_initial = sum( sum( Y_initial.^2 ));
+options = optimset('Algorithm', 'levenberg-marquardt');
+P = lsqnonlin(@(t) gs_errfunction(t, Xobs), P0, [], [], options);
+
+Hbc_r = reshape( P(1:9), 3, 3 );
+f = gs_errfunction( P, Xobs ); 
+err_final = sum( sum( f.^2 ));
+
+% we show the geometric error before and after the refinement
+fprintf(1, 'Gold standard reproj error initial %f, final %f\n', err_initial, err_final);
+
+
+
 
 
 %% See differences in the keypoint locations
 
 % ToDo: compute the points xhat and xhatp which are the correspondences
 % returned by the refinement with the Gold Standard algorithm
+nPoints = size(P(10:end),1)/2;
+
+xhat  = reshape(P(10:end), [2,nPoints]);
+xhat  = [xhat ; ones(1,nPoints)];
+xhatp = Hab_r*xhat;
+xhat  = euclid(xhat);
+xhatp = euclid(xhatp);
 
 figure;
 imshow(imbrgb);%image(imbrgb);
