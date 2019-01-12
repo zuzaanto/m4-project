@@ -1,4 +1,4 @@
-function [H, idx_inliers] = ransac_fundamental_matrix(x1, x2, th, max_it)
+function [H, idx_inliers] = ransac_fundamental_matrix(x1, x2, th)
 
 [Ncoords, Npoints] = size(x1);
 
@@ -7,12 +7,13 @@ it = 0;
 best_inliers = [];
 % probability that at least one random sample set is free of outliers
 p = 0.999; 
+max_it = 1000;
 while it < max_it
     
-    points = randomsample(Npoints, 4);
+    points = randomsample(Npoints, 8);
     H = fundamental_matrix(x1(:,points), x2(:,points));
     inliers = compute_inliers(H, x1, x2, th);
-    
+     
     % test if it is the best model so far
     if length(inliers) > length(best_inliers)
         best_inliers = inliers;

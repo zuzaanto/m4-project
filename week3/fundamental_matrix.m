@@ -11,9 +11,10 @@ W=[u1.*u2 v1.*u2 u2 u1.*v2 v1.*v2 v2 u1 v1 ones(size(x1,2),1)];
 [U, D, V] = svd(W);
 f=V(:,end);
 F3 = reshape(f, [3,3]);
-[U, D, V] = svd(F3);
+[U, D, V] = svd(F3');
 D(3,3)=0;
 F=U*D*V';
 F=T2'*F*T1;
+
 end
 

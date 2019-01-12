@@ -30,7 +30,6 @@ K2=K1;
 sm=t;
 ssm=[0 -sm(3) sm(2); sm(3) 0 -sm(1); -sm(2) sm(1) 0];
 F_gt = (K2')\ssm*R*inv(K1);  % ToDo: write the expression of the real fundamental matrix for P1 and P2
-% F_gt2 = inv(K2)'*cross(t',R*inv(K1));
 % Evaluation: these two matrices should be very similar
 F_gt / norm(F_gt)
 F_es / norm(F_es)
@@ -68,7 +67,7 @@ p1 = [points_1(1:2, matches(1,:)); ones(1, length(matches))];
 p2 = [points_2(1:2, matches(2,:)); ones(1, length(matches))];
 
 % ToDo: create this function (you can use as a basis 'ransac_homography_adaptive_loop.m')
-[F, inliers] = ransac_fundamental_matrix(p1, p2, 2.0,1000); 
+[F, inliers] = ransac_fundamental_matrix(p1, p2, 2.0); 
 
 % show inliers
 figure;
