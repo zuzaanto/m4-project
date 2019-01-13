@@ -13,7 +13,7 @@ while it < max_it
     points = randomsample(Npoints, 8);
     H = fundamental_matrix(x1(:,points), x2(:,points));
     inliers = compute_inliers(H, x1, x2, th);
-     
+        
     % test if it is the best model so far
     if length(inliers) > length(best_inliers)
         best_inliers = inliers;
@@ -36,25 +36,38 @@ idx_inliers = best_inliers;
 
 
 function idx_inliers = compute_inliers(H, x1, x2, th)
-    % Check that H is invertible
-    if abs(log(cond(H))) > 15
-        idx_inliers = [];
-        return
-    end
+    
+    %We don't need to check this sice we don't invert F?
+    % Check that H is invertible. 
+    %if abs(log(cond(H))) > 15
+    %    disp(abs(log(cond(H))))
+    %    idx_inliers = [];
+    %    return
+    %end
     
     % transformed points (in both directions)
     Hx1 = H * x1;
-    Hix2 = inv(H) * x2;
+    %Hix2 = inv(H) * x2;
     
     % normalise homogeneous coordinates (third coordinate to 1)
     x1 = normalise(x1);
     x2 = normalise(x2);     
-    Hx1 = normalise(Hx1);
-    Hix2 = normalise(Hix2); 
+    %Hx1 = normalise(Hx1);
+    %Hix2 = normalise(Hix2); 
     F=H;
     % compute the symmetric geometric error
 %     d2 = sum((x1 - Hix2).^2) + sum((x2 - Hx1).^2);
-    d2=sum((x2'*F*x1)^2/((F*x1)^2+(F'*x2)^2));
+    %d2=sum((x2'*F*x1).^2/((F*x1).^2+(F'*x2).^2));
+    
+    Fx1 = F*x1;
+    Fx2 = F*x2;
+    
+    x2Fx1 = x2.'*F*x1;
+    x2Fx1 = x2Fx1(:, 1)'; % x2Fx1(:, 1) == x2Fx1(:, 2) == x2Fx1(:, 2) ...
+        
+    d2=((x2Fx1).^2./...
+        (Fx1(1,:).^2 + Fx1(2,:).^2 + Fx2(1,:).^2 + Fx2(2,:).^2));
+    
     idx_inliers = find(d2 < th.^2);
 
 
