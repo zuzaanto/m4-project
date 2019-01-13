@@ -46,7 +46,7 @@ function idx_inliers = compute_inliers(H, x1, x2, th)
     %end
     
     % transformed points (in both directions)
-    Hx1 = H * x1;
+    %Hx1 = H * x1;
     %Hix2 = inv(H) * x2;
     
     % normalise homogeneous coordinates (third coordinate to 1)
@@ -60,7 +60,7 @@ function idx_inliers = compute_inliers(H, x1, x2, th)
     %d2=sum((x2'*F*x1).^2/((F*x1).^2+(F'*x2).^2));
     
     Fx1 = F*x1;
-    Fx2 = F*x2;
+    Fx2 = F'*x2;
     
     x2Fx1 = x2.'*F*x1;
     x2Fx1 = x2Fx1(:, 1)'; % x2Fx1(:, 1) == x2Fx1(:, 2) == x2Fx1(:, 2) ...
@@ -68,7 +68,7 @@ function idx_inliers = compute_inliers(H, x1, x2, th)
     d2=((x2Fx1).^2./...
         (Fx1(1,:).^2 + Fx1(2,:).^2 + Fx2(1,:).^2 + Fx2(2,:).^2));
     
-    idx_inliers = find(d2 < th.^2);
+    idx_inliers = find(d2 < th^2);
 
 
 function xn = normalise(x)    
