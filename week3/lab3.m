@@ -39,8 +39,12 @@ F_es / norm(F_es)
 %% 2. Robustly fit fundamental matrix
 
 % Read images
-im1rgb = imread('Data/0000_s.png');
-im2rgb = imread('Data/0001_s.png');
+%im1rgb = imread('Data/0000_s.png');
+%im2rgb = imread('Data/0001_s.png');
+
+im1rgb = imread('Data/castle_int/0014_s.png');
+im2rgb = imread('Data/castle_int/0015_s.png');
+
 im1 = sum(double(im1rgb), 3) / 3 / 255;
 im2 = sum(double(im2rgb), 3) / 3 / 255;
 
@@ -79,8 +83,16 @@ vgg_gui_F(im1rgb, im2rgb, F');
 
 %% Plot some epipolar lines
 
-%l2 = ... % epipolar lines in image 2 % ToDo
-%l1 = ... % epipolar lines in image 1 % ToDo
+% epipolar lines in image 2 % ToDo
+e2 = null(F');  %epipole
+e2 = e2 ./ e2(3);
+l2 = F * p1;
+
+% epipolar lines in image 1 % ToDo
+e1 = null(F);  %epipole
+e1 = e1 ./ e1(3);
+l1 = F' * p2;
+
 
 % choose three random indices
 m1 = inliers(10);
@@ -100,6 +112,9 @@ plot_homog_line(l1(:, m2));
 plot(p1(1, m3), p1(2, m3), '+g');
 plot_homog_line(l1(:, m3));
 
+scatter(e1(1), e1(2), 'red', 'x');
+text(e1(1)+10, e1(2)+10, '\color{red}e1');
+
 % image 2 (plot the three points and their corresponding epipolar lines)
 figure;
 imshow(im2rgb);
@@ -113,6 +128,8 @@ plot_homog_line(l2(:, m2));
 plot(p2(1, m3), p2(2, m3), '+g');
 plot_homog_line(l2(:, m3));
 
+scatter(e2(1), e2(2), 'red', 'x');
+text(e2(1)+10, e2(2)+10, '\color{red}e2');
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% 3. Photo-sequencing with aerial images
