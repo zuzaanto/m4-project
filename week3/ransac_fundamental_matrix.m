@@ -7,7 +7,7 @@ it = 0;
 best_inliers = [];
 % probability that at least one random sample set is free of outliers
 p = 0.999; 
-max_it = 1000;
+max_it = 10000;
 while it < max_it
     
     points = randomsample(Npoints, 8);
