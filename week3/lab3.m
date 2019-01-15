@@ -228,7 +228,7 @@ l3 = F_13' * point3;
 % plot the epipolar line
 plot(t, -(l3(1)*t + l3(3)) / l3(2), 'b');
 % ToDo: compute the projection of point idx_car_I3 in the reference image
-pi3 = cross(l1, l3);
+pi3 = cross(l2, l3);
 pi3 = pi3 ./ pi3(3);
 plot(pi3(1), pi3(2), 'b*');
 
@@ -239,7 +239,7 @@ l4 = F_14' * point4;
 % plot the epipolar line
 plot(t, -(l4(1)*t + l4(3)) / l4(2), 'g');
 % ToDo: compute the projection of point idx_car_I4 in the reference image
-pi4 = cross(l1, l4);
+pi4 = cross(l3, l4);
 pi4 = pi4 ./ pi4(3);
 plot(pi4(1), pi4(2), 'g*');
 
