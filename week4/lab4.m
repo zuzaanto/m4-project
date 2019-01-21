@@ -93,13 +93,26 @@ K = H * K;
 
 
 % ToDo: Compute the Essential matrix from the Fundamental matrix
-% E = ...
+E = K'*F*K;
 
 
 % ToDo: write the camera projection matrix for the first camera
-% P1 = ...
+
+%camera 1 is centered in the [0,0,0] and has no rotation, therefore:
+%P1 = identity * K I think
 
 % ToDo: write the four possible matrices for the second camera
+
+[U, S, V] = svd(E);
+W = [0, -1, 0; 1, 0, 0; 0, 0, 1];
+R1 = U * W' * V; % WE NEED TO CHECK THE DETERMINANT!
+R2 = U * W * V; % WE NEED TO CHECK THE DETERMINANT!
+%tx = U * W * S * U'; % another way of obtaining tx
+Z = [0, -1, 0; 1, 0, 0; 0, 0, 0];
+tx = U * Z * U';
+
+
+
 Pc2 = {};
 % Pc2{1} = ...
 % Pc2{2} = ...
