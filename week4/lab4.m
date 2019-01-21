@@ -32,7 +32,7 @@ x2_test = euclid(P2 * X_test);
 N_test = size(x1_test,2);
 X_trian = zeros(4,N_test);
 for i = 1:N_test
-%     X_trian(:,i) = triangulate(x1_test(:,i), x2_test(:,i), P1, P2, [2 2]);
+     X_trian(:,i) = triangulate(x1_test(:,i), x2_test(:,i), P1, P2, [2 2]);
 end
 
 % error
