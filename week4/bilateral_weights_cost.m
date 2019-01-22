@@ -24,13 +24,13 @@ w2 = exp(-delta_c2./gamma_c-delta_g./gamma_g);
 w=w1.*w2;
 
 if(strcmp(type,'NCC'))
-    mean1 = mean(x1,'all');
-    mean2 = mean(x2,'all');
-    sigma1 = sqrt(sum(w*(x1-mean1).^2,'all'));
-    sigma2 = sqrt(sum(w*(x2-mean2).^2,'all'));
-    cost = sum(w*(x1-mean1).*(x2-mean2),'all')/(sigma1*sigma2);
+    mean1 = mean(x1(:));
+    mean2 = mean(x2(:));
+    sigma1 = sqrt(sum(sum(w*(x1-mean1).^2)));
+    sigma2 = sqrt(sum(sum(w*(x2-mean2).^2)));
+    cost = sum(sum(w*(x1-mean1).*(x2-mean2)))/(sigma1*sigma2);
 else
-    cost = sum(w*(x1-x2).^2,'all')/sum(w,'all');
+    cost = sum(sum(w*(x1-x2).^2))/sum(sum(w));
 
 
 end
