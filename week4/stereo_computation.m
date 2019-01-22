@@ -29,13 +29,20 @@ for j =1+step:(nrows-step)
         template = imgR(j-step:j+step,i-step:i+step);
         rowCorr = zeros(maxDisp-minDisp+1,1);
         for d = minDisp:maxDisp
-            if(cost == 'NCC')
-                rowCorr(d+1)=ncc_cost(template, imgL(j-step:j+step, i-step+d:i+step+d));
-            else
+            if(strcmp(cost,'SSD'))
                 rowCorr(d+1)=ssd_cost(template, imgL(j-step:j+step, i-step+d:i+step+d));
             end
+            if(strcmp(cost,'NCC'))
+                rowCorr(d+1)=ncc_cost(template, imgL(j-step:j+step, i-step+d:i+step+d));
+            end
+            if(strcmp(cost,'SSD_bilateral'))
+                rowCorr(d+1)=bilateral_weights_cost(template, imgL(j-step:j+step, i-step+d:i+step+d),d, 'SSD');
+            end
+            if(strcmp(cost,'NCC_bilateral'))
+                rowCorr(d+1)=bilateral_weights_cost(template, imgL(j-step:j+step, i-step+d:i+step+d),d, 'NCC');
+            end
         end
-        if(cost == 'NCC')
+        if(strcmp(cost,'NCC') || strcmp(cost,'NCC_bilateral'))
             [~, idx] = max(rowCorr);
         else
             [~, idx] = min(rowCorr);
