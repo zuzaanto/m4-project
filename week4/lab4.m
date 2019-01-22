@@ -1,6 +1,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Lab 4: Reconstruction from two views (knowing internal camera parameters) 
 addpath('sift'); % ToDo: change 'sift' to the correct path where you have the sift functions
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% 1. Triangulation
 % ToDo: create the function triangulate.m that performs a triangulation
@@ -241,6 +242,15 @@ imshow(cast(disparity*255/16, 'uint8'));
 % results.
 % Notice that in this new data the minimum and maximum disparities may
 % change.
+
+imgL = imread('Data/0001_rectified_s.png');
+imgR = imread('Data/0002_rectified_s.png');
+win_size = 15;
+disp_min = 0;
+disp_max = 45;
+matching_cost = 'SSD';
+disparity = stereo_computation(imgL, imgR, disp_min, disp_max, win_size, matching_cost);
+imshow(cast(disparity*255/disp_max, 'uint8'));
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% 6. Bilateral weights
