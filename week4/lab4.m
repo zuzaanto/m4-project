@@ -1,12 +1,8 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Lab 4: Reconstruction from two views (knowing internal camera parameters) 
-
-
 addpath('sift'); % ToDo: change 'sift' to the correct path where you have the sift functions
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% 1. Triangulation
-
 % ToDo: create the function triangulate.m that performs a triangulation
 %       with the homogeneous algebraic method (DLT)
 %
@@ -36,9 +32,8 @@ for i = 1:N_test
 end
 
 % error
+disp('Error:')
 euclid(X_test) - euclid(X_trian)
-
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% 2. Reconstruction from two views
 
@@ -80,9 +75,6 @@ x2 = points{2}(:, inlier_matches(2, :));
 
 %vgg_gui_F(Irgb{1}, Irgb{2}, F');
 
-
-
-
 %% Compute candidate camera matrices.
 
 % Camera calibration matrix
@@ -95,29 +87,34 @@ K = H * K;
 % ToDo: Compute the Essential matrix from the Fundamental matrix
 E = K'*F*K;
 
-
 % ToDo: write the camera projection matrix for the first camera
 
 %camera 1 is centered in the [0,0,0] and has no rotation, therefore:
-%P1 = identity * K I think
+P1 = K*eye(3,4);
 
 % ToDo: write the four possible matrices for the second camera
-
 [U, S, V] = svd(E);
-W = [0, -1, 0; 1, 0, 0; 0, 0, 1];
-R1 = U * W' * V; % WE NEED TO CHECK THE DETERMINANT!
-R2 = U * W * V; % WE NEED TO CHECK THE DETERMINANT!
-%tx = U * W * S * U'; % another way of obtaining tx
+W = [0, -1, 0; 
+     1, 0, 0;
+     0, 0, 1];
+R1 = U * W' * V'; 
+R2 = U * W * V'; %
 Z = [0, -1, 0; 1, 0, 0; 0, 0, 0];
-tx = U * Z * U';
+t = U(:,3);
 
+if det(R1) < 0
+     R1 = -R1;
+end
 
+if det(R2) < 0
+     R2 = -R2;
+end
 
 Pc2 = {};
-% Pc2{1} = ...
-% Pc2{2} = ...
-% Pc2{3} = ...
-% Pc2{4} = ...
+Pc2{1} = K*[R1 t];
+Pc2{2} = K*[R1 -t];
+Pc2{3} = K*[R2 t];
+Pc2{4} = K*[R2 -t];
 
 % HINT: You may get improper rotations; in that case you need to change
 %       their sign.
@@ -127,26 +124,35 @@ Pc2 = {};
 % end
 
 % plot the first camera and the four possible solutions for the second
-% figure;
-% plot_camera(P1,w,h);
-% plot_camera(Pc2{1},w,h);
-% plot_camera(Pc2{2},w,h);
-% plot_camera(Pc2{3},w,h);
-% plot_camera(Pc2{4},w,h);
+figure;
+plot_camera(P1,w,h);
+plot_camera(Pc2{1},w,h);
+plot_camera(Pc2{2},w,h);
+plot_camera(Pc2{3},w,h);
+plot_camera(Pc2{4},w,h);
 
 
 %% Reconstruct structure
 % ToDo: Choose a second camera candidate by triangulating a match.
-% P2 = ...
+index = -1;
+for i=1:4
+    trian = triangulate(x1(:,1), x2(:,1), P1, Pc2{i}, [w h]);
+    proj1 = P1*trian;
+    proj2 = P2*trian;
+    if (proj1(3) >= 0) && (proj2(3) >= 0)
+        index = i;
+    end
+end
+
+disp(index)
+P2 = Pc2{index};
 
 % Triangulate all matches.
 N = size(x1,2);
 X = zeros(4,N);
 for i = 1:N
-%     X(:,i) = triangulate(x1(:,i), x2(:,i), P1, P2, [w h]);
+     X(:,i) = triangulate(x1(:,i), x2(:,i), P1, P2, [w h]);
 end
-
-
 
 %% Plot with colors
 r = interp2(double(Irgb{1}(:,:,1)), x1(1,:), x1(2,:));
@@ -162,12 +168,19 @@ end;
 axis equal;
 
 
-%% Compute reprojection error.
 
+%% Compute reprojection error.
 % ToDo: compute the reprojection errors
 %       plot the histogram of reprojection errors, and
 %       plot the mean reprojection error
-
+figure; 
+xp1 = euclid(P1*X);
+xp2 = euclid(P2*X);
+errors = [ sqrt(sum((x1-xp1).^2, 1)),sqrt(sum((x2-xp2).^2, 1))];
+histogram(errors);
+hold on
+mean = sum(errors) / (size(x2,2)*2);
+line([mean mean], ylim, 'Color','r');
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% 3. Depth map computation with local methods (SSD)
 
@@ -194,6 +207,7 @@ axis equal;
 % Note 1: Use grayscale images
 % Note 2: For this first set of images use 0 as minimum disparity 
 % and 16 as the the maximum one.
+figure;
 
 imgL = imread('Data/scene1.row3.col3.ppm');
 imgR = imread('Data/scene1.row3.col4.ppm');
@@ -210,6 +224,7 @@ imshow(cast(disparity*255/16, 'uint8'));
 %
 % Evaluate the results changing the window size (e.g. 3x3, 9x9, 20x20,
 % 30x30) and the matching cost. Comment the results.
+figure;
 
 disparity = stereo_computation(imgL, imgR, 0, 16, 5, 'NCC');
 imshow(cast(disparity*255/16, 'uint8'));
