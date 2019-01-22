@@ -243,13 +243,13 @@ imshow(cast(disparity*255/16, 'uint8'));
 % Notice that in this new data the minimum and maximum disparities may
 % change.
 
-imgL = imread('Data/0001_rectified_s.png');
-imgR = imread('Data/0002_rectified_s.png');
+imgLfacade = imread('Data/0001_rectified_s.png');
+imgRfacade = imread('Data/0002_rectified_s.png');
 win_size = 15;
 disp_min = 0;
 disp_max = 45;
 matching_cost = 'SSD';
-disparity = stereo_computation(imgL, imgR, disp_min, disp_max, win_size, matching_cost);
+disparity = stereo_computation(imgLfacade, imgRfacade, disp_min, disp_max, win_size, matching_cost);
 imshow(cast(disparity*255/disp_max, 'uint8'));
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -262,6 +262,9 @@ imshow(cast(disparity*255/disp_max, 'uint8'));
 % Comment the results and compare them to the previous results (no weights).
 %
 % Note: Use grayscale images (the paper uses color images)
+
+disparity = stereo_computation(imgL, imgR, 0, 16, 5, 'SSD_bilateral');
+imshow(cast(disparity*255/16, 'uint8'));
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% OPTIONAL:  Stereo computation with Belief Propagation
