@@ -99,8 +99,10 @@ W = [0, -1, 0;
      0, 0, 1];
 R1 = U * W' * V'; 
 R2 = U * W * V'; %
-Z = [0, -1, 0; 1, 0, 0; 0, 0, 0];
 t = U(:,3);
+%Z = [0, -1, 0; 1, 0, 0; 0, 0, 0];
+%tx = U * Z * U'; 
+%t = null(tx); % same result
 
 if det(R1) < 0
      R1 = -R1;
@@ -134,18 +136,17 @@ plot_camera(Pc2{4},w,h);
 
 %% Reconstruct structure
 % ToDo: Choose a second camera candidate by triangulating a match.
-index = -1;
+clear P2
+
 for i=1:4
-    trian = triangulate(x1(:,1), x2(:,1), P1, Pc2{i}, [w h]);
+    P2_tmp = cell2mat(Pc2(i));
+    trian = triangulate(x1(:,1), x2(:,1), P1, P2_tmp, [w h]);
     proj1 = P1*trian;
-    proj2 = P2*trian;
+    proj2 = P2_tmp*trian;
     if (proj1(3) >= 0) && (proj2(3) >= 0)
-        index = i;
+        P2 = P2_tmp;
     end
 end
-
-disp(index)
-P2 = Pc2{index};
 
 % Triangulate all matches.
 N = size(x1,2);
@@ -165,7 +166,8 @@ plot_camera(P2,w,h);
 for i = 1:length(Xe)
     scatter3(Xe(1,i), Xe(3,i), -Xe(2,i), 5^2, [r(i) g(i) b(i)]/255, 'filled');
 end;
-axis equal;
+set(gca,'XLim',[-3 4],'YLim',[-2 10],'ZLim',[-2 2.5])
+%axis equal;
 
 
 
