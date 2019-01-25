@@ -229,8 +229,8 @@ imshow(cast(disparity*255/16, 'uint8'));
 % 30x30) and the matching cost. Comment the results.
 figure;
 
-disparity = stereo_computation(imgL, imgR, 0, 16, 5, 'NCC');
-imshow(cast(disparity*255/16, 'uint8'));
+%disparity = stereo_computation(imgL, imgR, 0, 16, 5, 'NCC');
+%imshow(cast(disparity*255/16, 'uint8'));
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% 5. Depth map computation with local methods
