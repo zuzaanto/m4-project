@@ -18,17 +18,24 @@ lambda2 = ones(npoints);
 it = 0;
 
 max_it = 20;
+W = zeros(npoints,3*nimages);
 while it < max_it
     for i = 1:npoints
-            wedge(e1,q1(:,i))*(F1*q1(:,i))
-            temp1=wedge(e1,q1(:,i))
-            F1*q1(:,i)
-            norm(wedge(e1,q1(:,i))^2)
-            (wedge(e1,q1(:,i))*(F1*q1(:,i)))/norm(wedge(e1,q1(:,i))^2)
-            lambda1(i) = ((wedge(e1,q1(:,i))*(F1*q1(:,i)))/norm(wedge(e1,q1(:,i))^2))*lambda2(i);
-            lambda2(i) = (dot(wedge(e2,q2(:,i)),(F2*q2(:,i)))/norm(wedge(e2,q2(:,i))^2))*lambda1(i);
+            lambda1(i) = (transpose(q1(:,i))*F1*cross(e1,q1(:,i)))/(norm(cross(e1,q1(:,i)))^2)*lambda2(i);
+            lambda2(i) = (transpose(q2(:,i))*F2*cross(e2,q2(:,i)))/(norm(cross(e2,q2(:,i)))^2)*lambda1(i);
+%             lambda1(i) = ((wedge(e1,q1(:,i))*(F1*q1(:,i)))/norm(wedge(e1,q1(:,i))^2))*lambda2(i);
+%             lambda2(i) = (dot(wedge(e2,q2(:,i)),(F2*q2(:,i)))/norm(wedge(e2,q2(:,i))^2))*lambda1(i);
     end
+    it=it+1;
+    disp(it);
 end
+% construct W:
+for i = 1:npoints
+     W(:3,i) = lambda1(i)*q1(:,i);
+     W(4:,i) = lambda2(i)*q2(:,i);
+end
+W
+
 
 end
 
