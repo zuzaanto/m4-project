@@ -66,13 +66,15 @@ K = [709 0 450; 0 709 300; 0 0 1];
 Rz = [cos(0.88*pi/2) -sin(0.88*pi/2) 0; sin(0.88*pi/2) cos(0.88*pi/2) 0; 0 0 1];
 Ry = [cos(0.88*pi/2) 0 sin(0.88*pi/2); 0 1 0; -sin(0.88*pi/2) 0 cos(0.88*pi/2)];
 R1 = Rz*Ry;
-t1 = -R1*[40; 10; 5];
+%t1 = -R1*[40; 10; 5];
+t1 = -R1*[42; 5; 10];
 
 Rz = [cos(0.8*pi/2) -sin(0.8*pi/2) 0; sin(0.8*pi/2) cos(0.8*pi/2) 0; 0 0 1];
 Ry = [cos(0.88*pi/2) 0 sin(0.88*pi/2); 0 1 0; -sin(0.88*pi/2) 0 cos(0.88*pi/2)];
 Rx = [1 0 0; 0 cos(-0.15) -sin(-0.15); 0 sin(-0.15) cos(-0.15)];
 R2 = Rx*Rz*Ry;
 t2 = -R2*[45; 15; 5];
+
 
 P1 = zeros(3,4);
 P1(1:3,1:3) = R1;
@@ -248,6 +250,7 @@ axis equal
 % [v1] = vanishing_point(xo1, xf1, xo2, xf2)
 
 % Compute the vanishing points in each image
+
 v1 = vanishing_point(x1(:,21),x1(:,22),x1(:,23),x1(:,24));
 v2 = vanishing_point(x1(:,21),x1(:,23),x1(:,22),x1(:,24));
 v3 = vanishing_point(x1(:,1),x1(:,2),x1(:,4),x1(:,3));
@@ -259,6 +262,15 @@ v3p = vanishing_point(x2(:,1),x2(:,2),x2(:,4),x2(:,3));
 % ToDo: use the vanishing points to compute the matrix Hp that 
 %       upgrades the projective reconstruction to an affine reconstruction
 
+A = [triangulate(v1(1:2), v1p(1:2), Pproj(1:3,:), Pproj(4:6,:), [w, h])';
+     triangulate(v2(1:2), v2p(1:2), Pproj(1:3,:), Pproj(4:6,:), [w, h])';
+     triangulate(v3(1:2), v3p(1:2), Pproj(1:3,:), Pproj(4:6,:), [w, h])'];
+
+p = null(A);
+p = p ./ p(4);
+
+Hp = eye(4);
+Hp(end, :) = p';
 
 %% check results
 
@@ -309,9 +321,30 @@ axis equal
 % Use the following vanishing points given by three pair of orthogonal lines
 % and assume that the skew factor is zero and that pixels are square
 
-v1 = vanishing_point(x1(:,2),x1(:,5),x1(:,3),x1(:,6));
-v2 = vanishing_point(x1(:,1),x1(:,2),x1(:,3),x1(:,4));
-v3 = vanishing_point(x1(:,1),x1(:,4),x1(:,2),x1(:,3));
+u = vanishing_point(x1(:,2),x1(:,5),x1(:,3),x1(:,6));
+v = vanishing_point(x1(:,1),x1(:,2),x1(:,3),x1(:,4));
+z = vanishing_point(x1(:,1),x1(:,4),x1(:,2),x1(:,3));
+
+A = [u(1)*v(1), u(1)*v(2)+u(2)*v(1), u(1)*v(3)+u(3)*v(1), u(2)*v(2), u(2)*v(3)+u(3)*v(2), u(3)*v(3);
+     u(1)*z(1), u(1)*z(2)+u(2)*z(1), u(1)*z(3)+u(3)*z(1), u(2)*z(2), u(2)*z(3)+u(3)*z(2), u(3)*z(3);
+     v(1)*z(1), v(1)*z(2)+v(2)*z(1), v(1)*z(3)+v(3)*z(1), v(2)*z(2), v(2)*z(3)+v(3)*z(2), v(3)*z(3);
+     0,         1,                   0,                   0,         0,                   0        ;
+     1,         0,                   0,                  -1,         0,                   0        ];
+
+[U,S,V] = svd(A);
+Ov = V(:,end);
+O = [Ov(1), Ov(2), Ov(3);
+     Ov(2), Ov(4), Ov(5); 
+     Ov(3), Ov(5), Ov(6)];
+
+P = Pproj(1:3, :)*inv(Hp);
+%P = Pproj(4:6, :)*inv(Hp);
+M = P(:,1:3); 
+
+Af = chol(abs(inv(M'*O*M)));
+
+Ha = eye(4);
+Ha(1:3, 1:3) = inv(Ha);
 
 %% check results
 
@@ -439,5 +472,4 @@ axis equal;
 
 % Add a 4th view, incorporate new 3D points by triangulation, 
 % incorporate new views by resectioning, 
-% apply any kind of processing on the point cloud, ...)
-
+% apply any kind of processing on the point cloud, ...)% 
