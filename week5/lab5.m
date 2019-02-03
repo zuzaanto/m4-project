@@ -66,8 +66,8 @@ K = [709 0 450; 0 709 300; 0 0 1];
 Rz = [cos(0.88*pi/2) -sin(0.88*pi/2) 0; sin(0.88*pi/2) cos(0.88*pi/2) 0; 0 0 1];
 Ry = [cos(0.88*pi/2) 0 sin(0.88*pi/2); 0 1 0; -sin(0.88*pi/2) 0 cos(0.88*pi/2)];
 R1 = Rz*Ry;
-%t1 = -R1*[40; 10; 5];
-t1 = -R1*[42; 5; 10];
+t1 = -R1*[40; 10; 5];
+%t1 = -R1*[42; 5; 10];
 
 Rz = [cos(0.8*pi/2) -sin(0.8*pi/2) 0; sin(0.8*pi/2) cos(0.8*pi/2) 0; 0 0 1];
 Ry = [cos(0.88*pi/2) 0 sin(0.88*pi/2); 0 1 0; -sin(0.88*pi/2) 0 cos(0.88*pi/2)];
@@ -262,9 +262,9 @@ v3p = vanishing_point(x2(:,1),x2(:,2),x2(:,4),x2(:,3));
 % ToDo: use the vanishing points to compute the matrix Hp that 
 %       upgrades the projective reconstruction to an affine reconstruction
 
-A = [triangulate(v1(1:2), v1p(1:2), Pproj(1:3,:), Pproj(4:6,:), [w, h])';
-     triangulate(v2(1:2), v2p(1:2), Pproj(1:3,:), Pproj(4:6,:), [w, h])';
-     triangulate(v3(1:2), v3p(1:2), Pproj(1:3,:), Pproj(4:6,:), [w, h])'];
+A = [triangulate(euclid(v1), euclid(v1p), Pproj(1:3,:), Pproj(4:6,:), [w, h])';
+     triangulate(euclid(v2), euclid(v2p), Pproj(1:3,:), Pproj(4:6,:), [w, h])';
+     triangulate(euclid(v3), euclid(v3p), Pproj(1:3,:), Pproj(4:6,:), [w, h])'];
 
 p = null(A);
 p = p ./ p(4);
@@ -341,10 +341,10 @@ P = Pproj(1:3, :)*inv(Hp);
 %P = Pproj(4:6, :)*inv(Hp);
 M = P(:,1:3); 
 
-Af = chol(abs(inv(M'*O*M)));
+Af = chol(inv(M'*O*M));
 
 Ha = eye(4);
-Ha(1:3, 1:3) = inv(Ha);
+Ha(1:3, 1:3) = inv(Af)'; %inverse of the transpose not sure why
 
 %% check results
 

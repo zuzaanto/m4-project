@@ -51,8 +51,9 @@ while convergence == false
         Wold = W;
         % rescale columns
         WcolumnSum = sum(W.^2, 1);
-        W = W./sqrt(WcolumnSum);
-        WcolumnSum = sum(W.^2, 1);
+        %W = W./sqrt(WcolumnSum);
+        W = bsxfun (@ rdivide, W, WcolumnSum);
+        %WcolumnSum = sum(W.^2, 1);
         % rescale triplet rows
         WtripletSum1=sum(sum((W(1:3,:).^2)));
         WtripletSum2=sum(sum((W(4:end,:).^2)));
@@ -64,7 +65,7 @@ while convergence == false
         Wdiff = sum(sum(Wold-W));
         Wsum = sum(sum(W));
 
-        if abs(Wdiff/Wsum)<0.01
+        if abs(Wdiff/Wsum)<0.3
             balance= true;
         end
     end
