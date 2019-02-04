@@ -1,9 +1,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Lab 5: Reconstruction from uncalibrated viewas
-
-
 addpath('sift'); % ToDo: change 'sift' to the correct path where you have the sift functions
-
+addpath(genpath('VPdetection-CVPR14-master/'))
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% 0. Create synthetic data
@@ -66,8 +64,8 @@ K = [709 0 450; 0 709 300; 0 0 1];
 Rz = [cos(0.88*pi/2) -sin(0.88*pi/2) 0; sin(0.88*pi/2) cos(0.88*pi/2) 0; 0 0 1];
 Ry = [cos(0.88*pi/2) 0 sin(0.88*pi/2); 0 1 0; -sin(0.88*pi/2) 0 cos(0.88*pi/2)];
 R1 = Rz*Ry;
-t1 = -R1*[40; 10; 5];
-%t1 = -R1*[42; 5; 10];
+%t1 = -R1*[40; 10; 5];
+t1 = -R1*[42; 5; 10];
 
 Rz = [cos(0.8*pi/2) -sin(0.8*pi/2) 0; sin(0.8*pi/2) cos(0.8*pi/2) 0; 0 0 1];
 Ry = [cos(0.88*pi/2) 0 sin(0.88*pi/2); 0 1 0; -sin(0.88*pi/2) 0 cos(0.88*pi/2)];
@@ -393,50 +391,98 @@ axis equal
 %% read images
 Irgb{1} = double(imread('Data/0000_s.png'))/255;
 Irgb{2} = double(imread('Data/0001_s.png'))/255;
-
+I = cell(2,1);
 I{1} = sum(Irgb{1}, 3) / 3; 
 I{2} = sum(Irgb{2}, 3) / 3;
 
 Ncam = length(I);
 
 % ToDo: compute a projective reconstruction using the factorization method
+pts = cell(2,1);  dps = cell(2,1);
+
+for i = 1:2
+    [pts{i}, dps{i}] = sift(I{i}, 'Threshold', 0.01);
+end
+
+matches       = siftmatch(dps{1}, dps{2});
+pts_matched_1 = pts{1}(1:2, matches(1, :));
+pts_matched_2 = pts{2}(1:2, matches(2, :));
+
+[~, inliers]  = ransac_fundamental_matrix(homog(pts_matched_1), homog(pts_matched_2), 2.0);
+inliers       = matches(:, inliers);
+pts_matched_1 = pts{1}(1:2, inliers(1, :));
+pts_matched_2 = pts{2}(1:2, inliers(2, :));
+
+pts_matched_1 = homog(pts_matched_1);
+pts_matched_2 = homog(pts_matched_2);
+
+[Pproj, xpro] = factorization_method(pts_matched_1, pts_matched_2, 'sturm');
+
+for i=1:2
+    x_proj{i} = euclid(Pproj(3*i-2:3*i, :)*xpro);
+end
+
+x_d{1} = euclid(pts_matched_1);
+x_d{2} = euclid(pts_matched_2);
 
 % ToDo: show the data points (image correspondences) and the projected
 % points (of the reconstructed 3D points) in images 1 and 2. Reuse the code
 % in section 'Check projected points' (synthetic experiment).
 
+% image 1
+figure;
+imshow(Irgb{1}); hold on
+plot(x_d{1}(1,:),x_d{1}(2,:),'r*');
+plot(x_proj{1}(1,:),x_proj{1}(2,:),'bo');
+axis equal
+
+% image 2
+figure;
+imshow(Irgb{2}); hold on
+plot(x_d{2}(1,:), x_d{2}(2,:),'r*');
+plot(x_proj{2}(1,:), x_proj{2}(2,:),'bo');
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% 5. Affine reconstruction (real data)
-
 % ToDo: compute the matrix Hp that updates the projective reconstruction
 % to an affine one
-%
+%;;
 % You may use the vanishing points given by function 'detect_vps' that 
 % implements the method presented in Lezama et al. CVPR 2014
 % (http://dev.ipol.im/~jlezama/vanishing_points/)
 
 % This is an example on how to obtain the vanishing points (VPs) from three
 % orthogonal lines in image 1
-
-img_in =  'Data/0000_s.png'; % input image
 folder_out = '.'; % output folder
 manhattan = 1;
 acceleration = 0;
 focal_ratio = 1;
 params.PRINT = 1;
 params.PLOT = 1;
-[horizon, VPs] = detect_vps(img_in, folder_out, manhattan, acceleration, focal_ratio, params);
+img_in =  strcat(pwd,'\Data\0000_s.png'); %input image
+[horizon_line, VPs] = detect_vps(img_in, folder_out, manhattan, acceleration, focal_ratio, params);
+img_in =  strcat(pwd,'\Data\0001_s.png'); %input image
+[horizon_line2, VPs2] = detect_vps(img_in, folder_out, manhattan, acceleration, focal_ratio, params);
 
 
+A = [triangulate(VPs(:,1), VPs2(:,1), Pproj(1:3,:), Pproj(4:6,:), [w h])';
+    triangulate(VPs(:,2), VPs2(:,2), Pproj(1:3,:), Pproj(4:6,:), [w h])';
+    triangulate(VPs(:,3), VPs2(:,3), Pproj(1:3,:), Pproj(4:6,:), [w h])'];
+
+p = null(A);
+
+p = p / p(end);
+
+Hp = eye(4,4);
+Hp(end,:) = p';
 %% Visualize the result
 
-% x1m are the data points in image 1
-% Xm are the reconstructed 3D points (projective reconstruction)
+% pts_matched_1 are the data points in image 1
+% xpro are the reconstructed 3D points (projective reconstruction)
 
-r = interp2(double(Irgb{1}(:,:,1)), x1m(1,:), x1m(2,:));
-g = interp2(double(Irgb{1}(:,:,2)), x1m(1,:), x1m(2,:));
-b = interp2(double(Irgb{1}(:,:,3)), x1m(1,:), x1m(2,:));
-Xe = euclid(Hp*Xm);
+r = interp2(double(Irgb{1}(:,:,1)), pts_matched_1(1,:), pts_matched_1(2,:));
+g = interp2(double(Irgb{1}(:,:,2)), pts_matched_1(1,:), pts_matched_1(2,:));
+b = interp2(double(Irgb{1}(:,:,3)), pts_matched_1(1,:), pts_matched_1(2,:));
+Xe = euclid(Hp*xpro);
 figure; hold on;
 [w,h] = size(I{1});
 for i = 1:length(Xe)
@@ -449,7 +495,49 @@ axis equal;
 
 % ToDo: compute the matrix Ha that updates the affine reconstruction
 % to a metric one and visualize the result in 3D as in the previous section
+v1 = homog(VPs(:,1));
+v2 = homog(VPs(:,2));
+v3 = homog(VPs(:,3));
 
+A =   [v1(1)*v2(1) v1(1)*v2(2) + v1(2)*v2(1) v1(1)*v2(3) + v1(3)*v2(1) v1(2)*v2(2) v1(2)*v2(3) + v1(3)*v2(2) v1(3)*v2(3);
+            v1(1)*v3(1) v1(1)*v3(2) + v1(2)*v3(1) v1(1)*v3(3) + v1(3)*v3(1) v1(2)*v3(2) v1(2)*v3(3) + v1(3)*v3(2) v1(3)*v3(3);
+            v2(1)*v3(1) v2(1)*v3(2) + v2(2)*v3(1) v2(1)*v3(3) + v2(3)*v3(1) v2(2)*v3(2) v2(2)*v3(3) + v2(3)*v3(2) v2(3)*v3(3);
+            0           1                         0                         0           0                         0;
+            1           0                         0                         -1          0                         0];
+        
+[~,~, V] = svd(A);
+Ov = V(:,end);
+
+omega = [Ov(1) Ov(2) Ov(3);
+         Ov(2) Ov(4) Ov(5);
+         Ov(3) Ov(5) Ov(6)];
+     
+% We need to compute matrix A from slide 29 (lecture 9)
+P = Pproj(1:3, :)*inv(Hp);
+M = P(:,1:3);
+
+AAt = inv(M'*omega*M);
+
+A = chol(AAt);
+
+Ha = eye(4,4);
+Ha(1:3,1:3) = inv(A);
+
+%% Visualize the result
+
+% pts_matched_1 are the data points in image 1
+% xpro are the reconstructed 3D points (projective reconstruction)
+
+r = interp2(double(Irgb{1}(:,:,1)), pts_matched_1(1,:), pts_matched_1(2,:));
+g = interp2(double(Irgb{1}(:,:,2)), pts_matched_1(1,:), pts_matched_1(2,:));
+b = interp2(double(Irgb{1}(:,:,3)), pts_matched_1(1,:), pts_matched_1(2,:));
+Xe = euclid(Ha*Hp*xpro);
+figure; hold on;
+[w,h] = size(I{1});
+for i = 1:length(Xe)
+    scatter3(Xe(1,i), Xe(2,i), Xe(3,i), 2^2, [r(i) g(i) b(i)], 'filled');
+end;
+axis equal;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% 7. OPTIONAL: Projective reconstruction from two views
 

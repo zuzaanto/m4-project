@@ -64,8 +64,8 @@ while convergence == false
         
         Wdiff = sum(sum(Wold-W));
         Wsum = sum(sum(W));
-
-        if abs(Wdiff/Wsum)<0.3
+        abs(Wdiff/Wsum)
+        if abs(Wdiff/Wsum)<0.2
             balance= true;
         end
     end
@@ -87,7 +87,7 @@ while convergence == false
     x1_err = sum(sum ((euclid(x1) - euclid(Pproj(3*1-2:3*1, :)*Xproj)).^2));
     x2_err = sum(sum ((euclid(x2) - euclid(Pproj(3*2-2:3*2, :)*Xproj)).^2));
     x_err = (x1_err + x2_err)/(npoints * 2)
-    if abs(x_err-x_err_old)/x_err<0.001
+    if abs(x_err-x_err_old)/x_err<0.1  %0.2
         convergence = true;
     end
     
