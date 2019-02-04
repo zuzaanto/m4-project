@@ -435,12 +435,15 @@ imshow(Irgb{1}); hold on
 plot(x_d{1}(1,:),x_d{1}(2,:),'r*');
 plot(x_proj{1}(1,:),x_proj{1}(2,:),'bo');
 axis equal
+title ( 'proj_rec_1' )
 
 % image 2
 figure;
 imshow(Irgb{2}); hold on
 plot(x_d{2}(1,:), x_d{2}(2,:),'r*');
 plot(x_proj{2}(1,:), x_proj{2}(2,:),'bo');
+title ( 'proj_rec_2' )
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% 5. Affine reconstruction (real data)
 % ToDo: compute the matrix Hp that updates the projective reconstruction
@@ -487,7 +490,9 @@ figure; hold on;
 [w,h] = size(I{1});
 for i = 1:length(Xe)
     scatter3(Xe(1,i), Xe(2,i), Xe(3,i), 2^2, [r(i) g(i) b(i)], 'filled');
+    
 end;
+title ('affine_rec' )
 axis equal;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -515,10 +520,7 @@ omega = [Ov(1) Ov(2) Ov(3);
 % We need to compute matrix A from slide 29 (lecture 9)
 P = Pproj(1:3, :)*inv(Hp);
 M = P(:,1:3);
-
-AAt = inv(M'*omega*M);
-
-A = chol(AAt);
+A = chol(inv(M'*omega*M));
 
 Ha = eye(4,4);
 Ha(1:3,1:3) = inv(A);
@@ -537,6 +539,7 @@ figure; hold on;
 for i = 1:length(Xe)
     scatter3(Xe(1,i), Xe(2,i), Xe(3,i), 2^2, [r(i) g(i) b(i)], 'filled');
 end;
+title ('metric_rec' )
 axis equal;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% 7. OPTIONAL: Projective reconstruction from two views
